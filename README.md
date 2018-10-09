@@ -56,7 +56,7 @@ nvm use
 
 ##### install node dependencies
 ```
-yarn install --save sqlite3 && yarn install
+yarn install --G sqlite3 && yarn install
 ```
 
 ### Development
