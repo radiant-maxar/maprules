@@ -1,0 +1,10 @@
+{
+    "name": "MapRules",
+    "version": "0.0.1",
+    "description": "Custom mapping presets and validation rules",
+    "title": "MapRules",
+    "template": {
+        "withCompare": true,
+        "withGenerator": true
+    }
+}

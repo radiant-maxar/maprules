@@ -1,0 +1,55 @@
+{
+    "project": "Public Health Campaign",
+    "presets": [
+        {
+            "fields": [
+                {
+                    "keyCondition": 5,
+                    "key": "healthcare",
+                    "values": {}
+                },
+                {
+                    "keyCondition": 2,
+                    "key": "building",
+                    "values": {
+                        "required": [
+                            {
+                                "value": "yes"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "geometry": ["Area", "Point"],
+            "name": "Health Clinic",
+            "primary": [{ "key": "amenity", "val": "clinic" }]
+        },
+        {
+            "fields": [
+                {
+                    "keyCondition": 1,
+                    "key": "name",
+                    "values": {}
+                },
+                {
+                    "keyCondition": 1,
+                    "key": "opening_hours"
+                }
+            ],
+            "geometry": ["Area", "Way"],
+            "name": "Market",
+            "primary": { "key": "amenity", "val": "marketplace" }
+            
+        },
+        {
+            "fields": {},
+            "geometry": ["Point"],
+            "name": "Water Tap",
+            "primary": [
+                { "key": "amenity", "val": "drinking_water" },
+                { "key": "man_made", "val": "water_tap" }
+            ]
+        }
+    ],
+    "disabledFeatures": {}
+}

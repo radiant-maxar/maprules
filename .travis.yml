@@ -1,0 +1,10 @@
+sudo: required
+
+services: 
+  - docker
+
+before_install:
+  - docker build -t maprules .
+
+script:
+  - docker run maprules /bin/bash -c 'npm run test:fixture'

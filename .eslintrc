@@ -1,0 +1,17 @@
+{
+    "parser": "babel-eslint",
+    "env": {
+        "node": true,
+        "mocha": true,
+        "es6": true
+    },
+    "rules": {
+        "indent": ["warn", 4],
+        "quotes": [2, "single"],
+        "semi": [1, "always"],
+        "comma-dangle": ["error", "never"]
+    },
+    "parserOptions": {
+        "ecmaVersion": 6
+    }
+}

@@ -1,0 +1,79 @@
+{
+    "project": "Public Health Campaign",
+    "presets": [
+        {
+            "fields": [
+                {
+                    "keyCondition": 2,
+                    "key": "healthcare",
+                    "values": {}
+                },
+                {
+                    "keyCondition": 2,
+                    "key": "building",
+                    "values": {
+                        "required": [
+                            {
+                                "val": "yes"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "geometry": ["Area", "Point"],
+            "name": "Health Clinic",
+            "primary": [
+                { "key": "amenity", "val": "clinic" }
+            ]
+        },
+        {
+            "fields": [
+                {
+                    "keyCondition": 1,
+                    "key": "name",
+                    "values": {}
+                },
+                {
+                    "keyCondition": 1,
+                    "key": "opening_hours",
+                    "values": {
+                        "suggested": [
+                            { "val": "24/7" },
+                            { "val": "Mo-Su%2009:00-21:00" } 
+                        ]
+                    }
+                },
+                {
+                    "keyCondition": 1,
+                    "key": "height",
+                    "values": {
+                        "numeric": {
+                            "greaterThan": 0
+                        }
+                    }
+                }
+            ],
+            "geometry": ["Area"],
+            "name": "Market",
+            "primary": [
+                { "key": "amenity", "val": "marketplace" }
+            ]
+        },
+        {
+            "fields": [
+                {
+                    "keyCondition": 1,
+                    "key": "name",
+                    "values": {}
+                }
+            ],
+            "geometry": ["Point"],
+            "name": "Water Tap",
+            "primary": [
+                { "key": "amenity", "val": "drinking_water" },
+                { "key": "man_made", "val": "water_tap" }
+            ]
+        }
+    ],
+    "disabledFeatures": { "key": "amenity", "val": "school" }
+}

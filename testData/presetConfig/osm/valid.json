@@ -1,0 +1,93 @@
+{
+    "name": "Public Health Campaign",
+    "presets": [
+        {
+            "fields": [
+                {
+                    "keyCondition": 1,
+                    "key": "healthcare",
+                    "values": []
+                }
+            ],
+            "geometry": ["area", "node"],
+            "name": "Health Clinic",
+            "primary": [
+                { "key": "amenity", "val": "clinic" }
+            ]
+        },
+        {
+            "fields": [
+                {
+                    "keyCondition": 2,
+                    "key": "name",
+                    "values": []
+                },
+                {
+                    "keyCondition": 1,
+                    "key": "source",
+                    "values": [
+                        {
+                            "valCondition": 1,
+                            "values": ["bing", "dg"]
+                        }
+                    ]
+                },
+                {
+                    "keyCondition": 1,
+                    "key": "building",
+                    "values": [
+                        {
+                            "valCondition": 0,
+                            "values": ["house"]
+                        }
+                    ]
+                },
+                {
+                    "keyCondition": 2,
+                    "key": "opening_hours",
+                    "label": "Opening Hours",
+                    "placeholder": "24/7, sunrise to sunset...",
+                    "values": [
+                        {
+                            "valCondition": 2,
+                            "values": ["24/7", "sunrise to sunset"]
+                        }
+                    ]
+                },
+                {
+                    "keyCondition": 2,
+                    "key": "height",
+                    "values": [
+                        {
+                            "valCondition": 5,
+                            "values": [ "0" ]
+                        }
+                    ]
+                }
+            ],
+            "geometry": ["area"],
+            "name": "Market",
+            "primary": [
+                { "key": "amenity", "val": "marketplace" }
+            ]
+        },
+        {
+            "fields": [
+                {
+                    "keyCondition": 2,
+                    "key": "name",
+                    "values": []
+                }
+            ],
+            "geometry": ["node"],
+            "name": "Water Tap",
+            "primary": [
+                { "key": "amenity", "val": "drinking_water" },
+                { "key": "man_made", "val": "water_tap" }
+            ]
+        }
+    ],
+    "disabledFeatures": [
+        { "key": "amenity", "val": ["school"] }
+    ]
+}

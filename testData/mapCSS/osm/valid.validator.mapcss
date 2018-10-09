@@ -1,0 +1,36 @@
+way[amenity=clinic][!healthcare]:closed{
+    throwError: "'Health Clinic' preset must include healthcare";
+}
+node[amenity=clinic][!healthcare]{
+    throwError: "'Health Clinic' preset must include healthcare";
+}
+way[amenity=marketplace][!name]:closed{
+    throwWarning: "'Market' preset may include name";
+}
+way[amenity=marketplace][!source]:closed{
+    throwError: "'Market' preset must include source";
+}
+way[amenity=marketplace][source][source!~/^bing$|^dg$/]:closed{
+    throwError: "source must be 'bing','dg'";
+}
+way[amenity=marketplace][!building]:closed{
+    throwError: "'Market' preset must include building";
+}
+way[amenity=marketplace][building][building=~/^house$/]:closed{
+    throwError: "building must not be 'house'";
+}
+way[amenity=marketplace][!opening_hours]:closed{
+    throwWarning: "'Market' preset may include opening_hours";
+}
+way[amenity=marketplace][opening_hours][opening_hours!~/^24\/7$|^sunrise to sunset$/]:closed{
+    throwError: "opening_hours may be '24/7','sunrise to sunset'";
+}
+way[amenity=marketplace][!height]:closed{
+    throwWarning: "'Market' preset may include height";
+}
+way[amenity=marketplace][height][height <= 0]:closed{
+    throwError: "height must be greater than 0";
+}
+node[amenity=drinking_water][man_made=water_tap][!name]{
+    throwWarning: "'Water Tap' preset may include name";
+}
