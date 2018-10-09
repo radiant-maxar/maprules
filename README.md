@@ -25,7 +25,7 @@ The goal of MapRules is to simplify OpenStreetMap feature tagging and validation
 ubuntu!
 ```
 sudo apt-get update
-sudo apt-get -yq sqlite3 libsqlite-dev
+sudo apt-get install -yq sqlite3 libsqlite-dev
 ```
 
 centos!
@@ -56,8 +56,7 @@ nvm use
 
 ##### install node dependencies
 ```
-yarn install --save sqlite3
-yarn install
+yarn install --save sqlite3 && yarn install
 ```
 
 ### Development
