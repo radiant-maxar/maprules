@@ -1,6 +1,6 @@
 # Contributing to MapRules
 
-First off, thanks for considering to contribute! Before heading to file a ticket for a bug you found or an awesome idea, please read the [Code of Conduct](https://github.com/radiant-maxar/maprules/blob/master/CODE_OF_CONDUCT.md).
+First off, thanks for considering to contribute! Before heading to file a ticket for a bug you found or an awesome idea, please read the [Code of Conduct](link.to.code.of.conduct).
 
 # File an issue
 
@@ -28,18 +28,18 @@ These labels are for issues needing fixing...
 | bug-maprules    | bug that applies directly to the MapRules service code                       |
 | bug-integration | bug that applies to using MapRules in one of the tools it is integrated with |
 
-## Actionables :hammer:
+## Actionables 
 
-These labels are applied issues to describe who aught to hammer them out
+These labels are for issues to be handled
 
 | type             | description                                                                                               |
 |------------------|-----------------------------------------------------------------------------------------------------------|
 | good first issue | issue for first time contributors                                                                         |
 | help wanted      | a heftier task that requires some prior knowledge of or willingness to get to know the MapRules code base |
 
-## Features :squirrel:
+## features
 
-These labels are for features to be added and shipped in the future
+These labels are for features to be added
 
 | type             | description                                               |
 |------------------|-----------------------------------------------------------|
@@ -48,7 +48,7 @@ These labels are for features to be added and shipped in the future
 | rule             | feature that adds a new rule type for MapRules to support |
 | performance      | feature that makes MapRules more performant               |
 
-## discussion :telephone_receiver:
+## discussion
 
 These labels should be applied to issues that encapsulate some general discussion
 
@@ -57,7 +57,7 @@ These labels should be applied to issues that encapsulate some general discussio
 | question    | if it's not clear if a new feature should be in MapRules, or perhaps there lacks' clarity on how best to solve a problem, this label applies |
 | considering | if an ask is interesting but more consensus is needed before it's all systems go, this label applies                                         |
 
-## housekeeping :house_with_garden:
+## housekeeping
 
 These labels should be applied to indicate what developers are doing to address or not address an issues
 
