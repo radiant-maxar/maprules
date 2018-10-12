@@ -8,6 +8,7 @@ doc
 spec
 rules/
 !adapters/rules
+!schemas/rules
 maprule/
 db/*.sqlite
 node_modules/
