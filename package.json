@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maprules/maprules.git"
+    "url": "git+https://github.com/radiant-maxar/maprules.git"
   },
   "author": "MapRules Contributors",
   "license": "GPL-3.0-only",
