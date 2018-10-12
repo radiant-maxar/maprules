@@ -10,6 +10,5 @@ module.exports = [
     require('./presetConfig').post,
     require('./docs'),
     require('./spec'),
-    require('./rules'),
-    require('./maprule')
+    require('./rules')
 ];
