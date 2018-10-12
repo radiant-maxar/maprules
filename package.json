@@ -26,14 +26,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/radiant-maxar/maprules.git"
+    "url": "git+https://github.com/maprules/maprules.git"
   },
   "author": "MapRules Contributors",
   "license": "GPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/radiant-maxar/maprules/issues"
+    "url": "https://github.com/maprules/maprules/issues"
   },
-  "homepage": "https://github.com/radiant-maxar/maprules#readme",
+  "homepage": "https://github.com/maprules/maprules#readme",
   "nyc": {
     "include": [
       "adapters/**/*",
@@ -53,6 +53,7 @@
     "joi": "^13.1.2",
     "knex": "^0.14.4",
     "mapcss-parse": "github:radiant-maxar/mapcss-parse#develop",
+    "maprules-ui": "github:radiant-maxar  /maprules-ui#develop",
     "path": "^0.12.7",
     "pm2": "^2.10.3",
     "sqlite3": "^4.0.2",
