@@ -8,7 +8,7 @@ const wd = process.cwd();
 function build() {
 
     // build docs
-    shell.exec('npm run makeapidocs');
+    shell.exec('npm run makedocs');
     
     console.log(colors.rainbow('\n\nDOCS BUILT!!\n\n'));
     

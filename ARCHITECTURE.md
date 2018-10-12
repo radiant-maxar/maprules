@@ -35,7 +35,7 @@ The 'API' refers to the API and database that stores the tagging rules and forma
 
 #### Technical details
 
-- the API is written using [hapijs](https://hapijs.com/). For full documentation regarding the API, check out its own [documentation](link.to.api.docs)
+- the API is written using [hapijs](https://hapijs.com/). For full documentation regarding the API, check out its own [documentation](https://github.com/radiant-maxar/maprules/blob/master/maprules.apidocs.md)
 - each editor/tool integration is made possible by an `adapter` modules and a schema module. These generate files that make presets/validations usable in integrations.
 - the schema modules are written using [joi](https://github.com/hapijs/joi). These modules define what is a valid output for a given integration file as well as inputs for the config file.
 
@@ -49,12 +49,12 @@ Currently supported integrations and integrations in development are below...
 
 ### JOSM
 
-- the JOSM [MapRules Plugin]() provides support for MapRules in JOSM
+- the JOSM [MapRules Plugin](https://github.com/radiant-maxar/maprules-josm) provides support for MapRules in JOSM
 
-STATUS: Developed and awaiting integration into the [JOSM Plugins]() repo
+STATUS: Developed and awaiting integration into the [JOSM Plugins](https://github.com/openstreetmap/josm-plugins) repo
 
 ### iD
 
 - a feature branch brings MapRules support to iD
 
-STATUS: Still just a fork in the MapRules organization
+STATUS: Still just a [fork](https://github.com/radiant-maxar/iD/tree/remote-presets)
