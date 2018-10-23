@@ -9,10 +9,10 @@ Note, as the project grows, there may already be an issue addressing your issue.
 
 When writing a ticket, make sure you include the following (as they apply)...
 
-- [ ] Provide steps to replicate the error (i.e, I added this key and value condition, loaded up editor x. and problem y occurred)
-- [ ] Share a related screenshot, or better yet a GIF! 
+- Provide steps to replicate the error (i.e, I added this key and value condition, loaded up editor x. and problem y occurred)
+- Share a related screenshot, or better yet a GIF! 
     - For GIFS, [LICEcap](https://www.cockos.com/licecap/) is a goto for windows users, [peek](https://github.com/phw/peek) rules for linux, and [kap](https://getkap.co/) is a nice looking option for mac
-- [ ] If you can share a stack trace, please do so!
+- If you can share a stack trace, please do so!
 
 # Labelling your issue.
 
@@ -101,7 +101,7 @@ closes #10
 
 ```
 1. spin up maprules with fixture data
-2. curl `${link.to.maprules}/config/${uuid}/osmlint` osmlint conf
+2. curl `${link.to.maprules}/config/${uuid}/osmlint`
 3. run the osmlint command `${some.osmlint.command} --confpath ${path.to.conf.you.downloaded}
 4. see expected osmlint output.
 ```
