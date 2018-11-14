@@ -3,10 +3,12 @@
 const Joi = require('joi');
 const presetSchema = require('./preset');
 
+const disabledFeatures = Joi.object({ key: Joi.string(), val: Joi.array().items(Joi.string()) });
+
 const keys = {
     name: Joi.string(),
     presets: Joi.array().items(presetSchema),
-    disabledFeatures: Joi.array().items(Joi.object({ key: Joi.string(), val: Joi.array().items(Joi.string()) }))
+    disabledFeatures: Joi.array().items(disabledFeatures)
 };
 
 const requiredKeys = ['name','presets'];

@@ -9,7 +9,7 @@
                     "values": []
                 }
             ],
-            "geometry": ["area", "node"],
+            "geometry": ["area", "point"],
             "name": "Health Clinic",
             "primary": [
                 { "key": "amenity", "val": "clinic" }
@@ -79,7 +79,7 @@
                     "values": []
                 }
             ],
-            "geometry": ["node"],
+            "geometry": ["point"],
             "name": "Water Tap",
             "primary": [
                 { "key": "amenity", "val": "drinking_water" },
