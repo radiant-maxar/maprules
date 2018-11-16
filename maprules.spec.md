@@ -131,11 +131,11 @@
 ```
 
 ### OSM Type schema
-| Geometry Type | value  | description                                          |
-|:-------------:|--------|------------------------------------------------------|
-|     point     | String | geometry interpretable as osm node                   |
-|      line     | String | geometry interpretable as osm way (open or closed)   |
-|      area     | String | geometry interpretable as osm closed-way w/area tags |
+| Geometry Type | value  | description                                             |
+|:-------------:|--------|---------------------------------------------------------|
+|     point     | String | geometry interpretable as osm node                      |
+|      line     | String | geometry interpretable as osm way (open or closed)      |
+|      area     | String | geometry interpretable as osm closed way with area tags |
 <br/>
 
 ### Field schema
