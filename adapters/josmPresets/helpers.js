@@ -1,6 +1,11 @@
 'use strict';
 
+const POINT = require('../constants').POINT;
+const LINE = require('../constants').LINE;
 const AREA = require('../constants').AREA;
+
+const NODE = require('../constants').NODE;
+const WAY = require('../constants').WAY;
 const CLOSEDWAY = require('../constants').CLOSEDWAY;
 
 /**
@@ -10,13 +15,9 @@ const CLOSEDWAY = require('../constants').CLOSEDWAY;
  */
 exports.inferJosmGeometries = (geometry) => {
     return geometry.reduce((josmGeometries, geometry) => {
-        if (geometry === AREA || geometry === CLOSEDWAY) {
-            if (josmGeometries.indexOf(CLOSEDWAY) === -1) {
-                josmGeometries.push(CLOSEDWAY);
-            }
-        } else {
-            josmGeometries.push(geometry);
-        }
+        if (geometry === AREA) josmGeometries.push(CLOSEDWAY);
+        if (geometry === LINE) josmGeometries.push(WAY);
+        if (geometry === POINT) josmGeometries.push(NODE);
         return josmGeometries;
     }, []);
 };

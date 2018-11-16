@@ -2,8 +2,7 @@
 
 const regex = {
     editor: /^idEditor$|^josmEditor$/i,
-    maprulesGeometries: /^node$|^(closed)?way$|^area$/i,
-    oldMapRulesGeometries: /^Point$|^Line$|^Area$/,
+    maprulesGeometries: /^point$|^line$|^area$/i,
     josmGeometries: /([node|way|closedway],?)*/,
     iDGeometries: /^point$|^line$|^area$|^relation$|^vertex$/,
     iDCategories: /category-(point|area|line)/,

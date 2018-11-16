@@ -1,9 +1,11 @@
 'use strict';
 
+const NODE = require('../../constants').NODE;
+const WAY = require('../../constants').WAY;
+
 const buildTagChecks = require('./tagChecks');
 const buildDisabledFeatureChecks = require('../../disabledFeatures');
 
-const translateOsmType = require('../../helpers').translateOsmType;
 const flattenElements = require('../../helpers').flattenElements;
 const inferJosmGeometries = require('../../josmPresets/helpers').inferJosmGeometries;
 
@@ -28,7 +30,7 @@ module.exports = (config) => {
     });
 
     if (config.hasOwnProperty('disabledFeatures')) {
-        const disabledFeatures = ['node', 'way'].map((geom) => {
+        const disabledFeatures = [NODE, WAY].map((geom) => {
             return buildDisabledFeatureChecks(config.disabledFeatures, geom, config.name);
         });
         configRules.concat(disabledFeatures);

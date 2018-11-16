@@ -11,7 +11,6 @@ const escaped = require('../../adapters/helpers').escaped;
 const setNumericRange = require('../../adapters/iDPresets/helpers').setNumericRange;
 const makeNumeric = require('../../adapters/iDPresets/helpers').makeNumeric;
 const makeCombo = require('../../adapters/iDPresets/helpers').makeCombo;
-const inferiDGeometries = require('../../adapters/iDPresets/helpers').inferiDGeometries;
 // josm preset helpers
 const inferJosmGeometries = require('../../adapters/josmPresets/helpers').inferJosmGeometries;
 const josmGeometries = require('../../schemas/components').josmGeometries;
@@ -203,28 +202,12 @@ describe('helpers', () => {
                 ].forEach(t => expect(makeCombo(t.test)).to.eql(t.result));
             });
         });
-        describe('inferGeometries', () => {
-            it('replies provided geometry when provided non-closedway osmType', () => {
-                expect(inferiDGeometries([WAY, AREA, NODE], [])).to.eql([LINE, AREA, POINT]);
-            });
-            it('replies inferred geometry when provided closedway osmType', () => {
-                const different = [CLOSEDWAY, NODE];
-                let tags = [{key: 'natural', val: 'wood'}];
-                expect(inferiDGeometries(different, tags)).to.eql([AREA, POINT]);
-
-                tags = [{key: 'natural', val: 'tree_row'}];
-                expect(inferiDGeometries(different, tags)).to.eql([CLOSEDWAY, POINT]);
-            });
-        });
     });
     describe('josmPresets', () => {
         describe('inferJosmTypes', () => {
-            it ('removes duplicate types when area & closedway present', () => {
-                expect(inferJosmGeometries([AREA, CLOSEDWAY])).to.eql([CLOSEDWAY]);
-            });
             it ('returns josm type equivalents', () => {
-                const inferred = inferJosmGeometries([AREA, CLOSEDWAY, WAY, NODE]);
-                expect(inferred).to.eql([CLOSEDWAY, WAY, NODE]);
+                const inferred = inferJosmGeometries([POINT, LINE, AREA]);
+                expect(inferred).to.eql([NODE, WAY, CLOSEDWAY]);
                 inferred.forEach(i => {
                     const validation = Joi.validate(i, josmGeometries);
                     expect(validation.value).to.eql(i);

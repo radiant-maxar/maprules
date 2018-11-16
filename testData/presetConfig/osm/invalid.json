@@ -20,7 +20,7 @@
                     }
                 }
             ],
-            "geometry": ["Area", "Point"],
+            "geometry": ["area", "node"],
             "name": "Health Clinic",
             "primary": [{ "key": "amenity", "val": "clinic" }]
         },
@@ -36,14 +36,14 @@
                     "key": "opening_hours"
                 }
             ],
-            "geometry": ["Area", "Way"],
+            "geometry": ["area", "way"],
             "name": "Market",
             "primary": { "key": "amenity", "val": "marketplace" }
             
         },
         {
             "fields": {},
-            "geometry": ["Point"],
+            "geometry": ["node"],
             "name": "Water Tap",
             "primary": [
                 { "key": "amenity", "val": "drinking_water" },
