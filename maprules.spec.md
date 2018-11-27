@@ -34,7 +34,7 @@
                     "values": []
                 }
             ],
-            "geometry": ["node", "area"],
+            "geometry": ["point", "area"],
             "name": "Water Tap",
             "primary": [
                 { 
@@ -109,7 +109,7 @@
 ```
 {
     "fields": [{...},{...}],
-    "geometry": ["node"],
+    "geometry": ["point"],
     "name": "Water Tap",
     "primary": [
         { "key": "amenity", "val": "drinking_water" },
@@ -127,16 +127,15 @@
 <br/>
 
 ```
-["area", "node"]
+["area", "point"]
 ```
 
 ### OSM Type schema
-| Geometry Type | value  | description                                |
-|:-------------:|--------|--------------------------------------------|
-|      node     | String | osm node type                              |
-|      way      | String | osm (open) way type                        |
-|   closedway   | String | osm closed way type                        |
-|      area     | String | osm closed way with 'area=yes' tag applied |
+| Geometry Type | value  | description                                             |
+|:-------------:|--------|---------------------------------------------------------|
+|     point     | String | geometry interpretable as osm node                      |
+|      line     | String | geometry interpretable as osm way (open or closed)      |
+|      area     | String | geometry interpretable as osm closed way with area tags |
 <br/>
 
 ### Field schema
@@ -172,11 +171,11 @@
 | suggestedValues | Array  | Optional array used to suggest values when 'must be' value condition present |
 
 ### Key Condition schema
-| value | description                                                              | validation type |
-|:-----:|--------------------------------------------------------------------------|:---------------:|
+| value | description                                                             | validation type |
+|:-----:|-------------------------------------------------------------------------|:---------------:|
 |   0   | A feature **must not** have this key. When key present, throw an error. |      error      |
 |   1   | A feature ***must** have this key. When key absent, throw error.        |      error      |
-|   2   | A feature **may** have, but is not required to have, this key.         |     warning     |
+|   2   | A feature **may** have, but is not required to have, this key.          |     warning     |
 <br/>
 ### Value Condition schema 
 
