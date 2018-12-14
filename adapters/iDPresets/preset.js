@@ -7,18 +7,18 @@ const titleCase = require('../helpers').titleCase;
 const getTags = require('./helpers').getTags;
 const makeCombo = require('./helpers').makeCombo;
 const makeNumeric = require('./helpers').makeNumeric;
-const inferiDGeometries = require('./helpers').inferiDGeometries;
 
 const ID_GENERIC_FIELDS = require('../constants').ID_GENERIC_FIELDS;
 const generics = Object.keys(ID_GENERIC_FIELDS);
 
 module.exports = (preset) => {
     const iDPreset = {
-        geometry: inferiDGeometries(preset.geometry, preset.primary),
+        geometry: preset.geometry, 
         tags: getTags(preset.primary),
         icon: 'maki-natural',
         name: preset.name,
-        fields: []
+        fields: [],
+        matchScore: 2
     };
     
     const iDFields = [];

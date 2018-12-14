@@ -10,11 +10,26 @@ MapRules is an api service that allows mappers and mapping campaign managers to 
 
 The goal of MapRules is to simplify OpenStreetMap feature tagging and validation.
 
-### Documentation
+#### Documentation
 
-- [MapRules Configuration Spec](https://github.com/maprules/maprules/blob/develop/maprules.spec.md)
-- [Validation Scenarios](https://github.com/maprules/maprules/blob/develop/maprules.validation.scenarios.md) 
-- [Api Documentation](https://github.com/maprules/maprules/blob/develop/maprules.apidocs.md)
+- [MapRules Configuration Spec](https://github.com/radiant-maxar/maprules/blob/master/maprules.spec.md)
+- [Validation Scenarios](https://github.com/radiant-maxar/maprules/blob/master/maprules.validation.scenarios.md) 
+- [Api Documentation](https://github.com/radiant-maxar/maprules/blob/master/maprules.apidocs.md)
+
+#### Contributing
+- [Code of Conduct](https://github.com/radiant-maxar/maprules/blob/master/CODE_OF_CONDUCT.md)
+- [Contributing](https://github.com/radiant-maxar/maprules/blob/master/CONTRIBUTING.md)
+
+#### Links to other MapRules Repos
+
+- [MapRules User Interface](https://github.com/radiant-maxar/maprules-ui)
+- [iD Fork](https://github.com/radiant-maxar/iD/tree/remote-presets)
+- [JOSM Plugin](https://github.com/radiant-maxar/maprules-josm)
+- [MapCSS Parse](https://github.com/radiant-maxar/mapcss-parse)
+- [Tasking Manager 2 Fork](https://github.com/radiant-maxar/osm-tasking-manager2/tree/maprules-dev)
+
+
+...see the [Architecture](https://github.com/maprules/maprules/blob/master/ARCHITECTURE.md) for a technical decsription of the repos work together
 
 ## Getting Started
 

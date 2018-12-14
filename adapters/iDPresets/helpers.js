@@ -62,29 +62,4 @@ exports.getTags = (primaryTags) => {
     }, {}); 
 };
 
-/**
- * Given list of geometries, returns provided/inferred geometry
- * @param {Array} geometries array of geometries
- * @param {Array} primaryTags array of preset's primary tags
- * @return {Array} array of geometry strings
- */
-exports.inferiDGeometries = (geometries, primaryTags) => {
-    return geometries.map(geometry => {
-        // using the iD solution to the iD/JOSM convention of 
-        // inferring geometry types for closed way using feature keys...
-        if (geometry === CLOSEDWAY) {
-            const primaryMap = primaryTags.reduce((tags, tag) => { 
-                tags[tag.key] = tag.val;
-                return tags;
-            }, {});
-            return isArea(primaryMap) ? AREA : CLOSEDWAY;
-        } else if (geometry === AREA) {
-            return geometry.toLowerCase();
-        } else {
-            return geometry.toLowerCase() === WAY ? LINE : POINT;
-        }
-    });
-    
-};
-
 exports.getiDDefaults = () => JSON.parse(JSON.stringify(ID_DEFAULTS));
