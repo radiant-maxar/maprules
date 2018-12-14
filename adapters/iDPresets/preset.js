@@ -17,7 +17,8 @@ module.exports = (preset) => {
         tags: getTags(preset.primary),
         icon: 'maki-natural',
         name: preset.name,
-        fields: []
+        fields: [],
+        matchScore: 2
     };
     
     const iDFields = [];
