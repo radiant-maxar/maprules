@@ -1,6 +1,7 @@
 'use strict';
 
 const buildiDPreset = require('./preset');
+const ID_DEFAULT_CATEGORIES = require('../constants').ID_DEFAULT_CATEGORIES;
 const ID_GENERIC_FIELDS = require('../constants').ID_GENERIC_FIELDS;
 const ID_GEOM_PRESETS = require('../constants').ID_GEOM_PRESETS;
 
@@ -9,6 +10,9 @@ const getiDDefaults = require('./helpers').getiDDefaults;
 module.exports = (config) => {
     try {
         const iDPresets = { categories: {}, presets: {}, fields: {}, defaults: getiDDefaults() };
+
+        iDPresets.categories = ID_DEFAULT_CATEGORIES;
+
         config.presets.forEach(configPreset => {
             if (configPreset.hasOwnProperty('fields')) {
                 const {preset, fields} = buildiDPreset(configPreset);
@@ -22,24 +26,8 @@ module.exports = (config) => {
 
                 preset[presetName].geometry.forEach(g => {
                     iDPresets.defaults[g.toLowerCase()].push(presetName);
-
                     const geomCategory = `category-${g.toLowerCase()}`;
-                    const first = !iDPresets.categories.hasOwnProperty(geomCategory);
-
-                    if (first) {
-                        iDPresets.categories[geomCategory] = {};
-                    };
-
-                    iDPresets.categories[geomCategory] = Object.assign(iDPresets.categories[geomCategory], {
-                        icon: 'maki-natural',
-                        geometry: g.toLowerCase(),
-                        name: `MapRules ${g} Features`,
-                        members: (() => { 
-                            const members = first ? [] : iDPresets.categories[geomCategory].members;
-                            members.push(presetName); 
-                            return members;
-                        })()
-                    });
+                    iDPresets.categories[geomCategory].members.push(presetName);
                 });
             }
         });
