@@ -11,7 +11,7 @@ I make a MapRules config file.
 I download the MapRules JOSM plugin
 I use that MapRules config for custom JOSM presets and validations that enforce MapRules Validations I wrote.
 
-See the INTEGRATIONS.md file for currently and 'in development' integrations.
+See the [Integrations paragraph](#integrations) for currently and 'in development' integrations.
 
 ## Software Components
 
@@ -43,7 +43,7 @@ The 'API' refers to the API and database that stores the tagging rules and forma
 
 ### Overview
 
-Integrations refer to plugins and features in different editors and tools that make MapRules presets and validation rules usable. 
+Integrations refer to plugins and features in different editors and tools that make MapRules presets and validation rules usable.
 
 Currently supported integrations and integrations in development are below...
 
