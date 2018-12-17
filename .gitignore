@@ -15,4 +15,4 @@ node_modules/
 .nyc_output/
 .vscode/
 coverage/
-
+adapters/iDPresets/icons.json

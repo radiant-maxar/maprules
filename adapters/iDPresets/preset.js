@@ -4,6 +4,7 @@ const uuidv4 = require('uuid/v4');
 const valuesImplyCombo = require('../helpers').valuesImplyCombo;
 const titleCase = require('../helpers').titleCase;
 
+const getIcon = require('./helpers').getIcon;
 const getTags = require('./helpers').getTags;
 const makeCombo = require('./helpers').makeCombo;
 const makeNumeric = require('./helpers').makeNumeric;
@@ -15,7 +16,7 @@ module.exports = (preset) => {
     const iDPreset = {
         geometry: preset.geometry, 
         tags: getTags(preset.primary),
-        icon: 'maki-natural',
+        icon: getIcon(preset.primary),
         name: preset.name,
         fields: [],
         matchScore: 2
