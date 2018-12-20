@@ -15,6 +15,7 @@ const CLOSEDWAY = require('../constants').CLOSEDWAY;
  */
 exports.inferJosmGeometries = (geometry) => {
     return geometry.reduce((josmGeometries, geometry) => {
+        geometry = geometry.toLowerCase();
         if (geometry === AREA) josmGeometries.push(CLOSEDWAY);
         if (geometry === LINE) josmGeometries.push(WAY);
         if (geometry === POINT) josmGeometries.push(NODE);
