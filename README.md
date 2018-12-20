@@ -76,7 +76,12 @@ yarn install -G sqlite3 && yarn install
 
 ### Development
 
-#### build docs & ui
+#### build docs, ui, and iD presets
+
+
+:warning: 
+**You really...REALLY need to make sure this build command is run! It builds a dictionary of iD presets ~ icons that MapRules needs to run!!**
+:warning:
 
 ```
 yarn build
