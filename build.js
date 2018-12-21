@@ -30,7 +30,7 @@ function build() {
         const presetsLocation = wd + '/adapters/iDPresets/icons.json';
         writeFile(presetsLocation, JSON.stringify(icons), (err) => {
             if (err) {
-                console.log(colors.bgRed('\nFAILED TO WRITE ICONS!!!\n'))
+                console.log(colors.bgRed('\nFAILED TO WRITE ICONS!!!\n'));
                 console.log(err);
                 process.exit(1);
             }
