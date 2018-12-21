@@ -5,6 +5,7 @@ module.exports = [
     require('./iDRules').get,
     require('./josmPresets').get,
     require('./josmRules').get,
+    require('./mapcss').post,
     require('./presetConfig').get,
     require('./presetConfig').put,
     require('./presetConfig').post,
