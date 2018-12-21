@@ -20,6 +20,9 @@ Custom mapping presets and validation rules
 	- [Get iD Presets for a given MapRules Config](#get-id-presets-for-a-given-maprules-config)
 	- [Get json equivalent MapCSS rules for a given MapRules config](#get-json-equivalent-mapcss-rules-for-a-given-maprules-config)
 	
+- [mapcss](#mapcss)
+	- [Convert MapCSS Validation Rule to JSON](#convert-mapcss-validation-rule-to-json)
+	
 
 
 # <a name='config'></a> Config
@@ -755,3 +758,32 @@ Error-Response: id parameter does not match uuid v4 schema
 ```
 {"statusCode":400,"error":"Bad Request","message":"Invalid request params input"}
 ```
+# <a name='mapcss'></a> mapcss
+
+## <a name='convert-mapcss-validation-rule-to-json'></a> Convert MapCSS Validation Rule to JSON
+[Back to top](#top)
+
+
+
+	POST /mapcss
+
+
+
+### Examples
+
+Example Usage
+
+```
+curl -H "Content-Type: text/html" -X POST -d 'node[healthcare=yes][!name]{ throwError: \"'healthcare' preset must include name\"; } way[healthcare=yes][!name]:closed{ throwError: \"'healthcare' preset must include name\"; }'
+```
+
+
+### Success Response
+
+Success-Response
+
+```
+[{\"geometry\":\"node\",\"equals\":{\"healthcare\":\"yes\"},\"absence\":\"name\",\"error\":\"'healthcare' preset must include name\"},{\"geometry\":\"closedway\",\"equals\":{\"healthcare\":\"yes\"},\"absence\":\"name\",\"error\":\"'healthcare' preset must include name\"}]
+```
+
+
