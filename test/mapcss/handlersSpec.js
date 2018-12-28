@@ -5,13 +5,14 @@ const expect = chai.expect;
 const server = require('../server');
 const mergeDefaults = require('../mergeDefaults');
 const post = require('../../routes/mapcss').post;
-const validMapCss = [
-    require('../../testData/mapCSS/osm/valid.validator.mapcss')
-];
+const fs = require('fs');
+const validMapCss = ['way[amenity=clinic][!healthcare]:closed{'
+    + 'throwError: "Health Clinic preset must include healthcare";}'];
 
-const invalidMapCss = [
-    require('../../testData/mapCSS/osm/invalid.validator.mapcss')
-];
+const invalidMapCss = ['way [amenity=clinic][!healthcare]:closed{'
+    + 'throwError: "Health Clinic preset must include healthcare";}'];
+
+
 module.exports = () => {
     before(async () => await server.liftOff(post));
     describe('post', () => {
