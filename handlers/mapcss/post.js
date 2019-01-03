@@ -6,13 +6,16 @@ module.exports = async (r, h) => {
     try {
         const mapcss = r.payload;
         const rulesMapCSS = parseMapCSS(mapcss);
-        rulesMapCSS.includes(function(rule){
-			if (![/geometry/, /equals/, /throw|error/].every((required => rule.includes(key => required.test(key))))) {
-			    throw new Error();
-			}
+        const usabledMapCSS = rulesMapCSS.every(obj => {
+            const keys = Object.keys(obj);
+            return [/geometry/, /(not)?equals/, /error|warning/].every(requiredKey => {
+                return keys.findIndex(key => requiredKey.test(key)) >= 0;
+            });
         });
-	    return h.response(rulesMapCSS).header('Content-Type', 'application/json').code(200);
 
+        if (!usabledMapCSS) throw new Error();
+
+        return h.response(rulesMapCSS).header('Content-Type', 'application/json').code(200);
     } catch (error) {
         return Boom.boomify(error, { statusCode: 400 });
     }
