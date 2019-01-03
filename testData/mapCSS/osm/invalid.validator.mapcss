@@ -1,3 +1,0 @@
-way [amenity=clinic][!healthcare]:closed{
-    throwError: "'Health Clinic' preset must include healthcare";
-}
