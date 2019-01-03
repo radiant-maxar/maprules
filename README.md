@@ -1,4 +1,4 @@
-# MapRules 
+# MapRules
 Custom mapping presets and validation rules
 
 <!-- ![](./assets/logo.png =250x) -->
@@ -6,14 +6,14 @@ Custom mapping presets and validation rules
 
 ### About
 
-MapRules is an api service that allows mappers and mapping campaign managers to define custom mapping presets and validation rules usable in OpenStreetMap Editors. 
+MapRules is an api service that allows mappers and mapping campaign managers to define custom mapping presets and validation rules usable in OpenStreetMap Editors.
 
 The goal of MapRules is to simplify OpenStreetMap feature tagging and validation.
 
 #### Documentation
 
 - [MapRules Configuration Spec](https://github.com/radiant-maxar/maprules/blob/master/maprules.spec.md)
-- [Validation Scenarios](https://github.com/radiant-maxar/maprules/blob/master/maprules.validation.scenarios.md) 
+- [Validation Scenarios](https://github.com/radiant-maxar/maprules/blob/master/maprules.validation.scenarios.md)
 - [Api Documentation](https://github.com/radiant-maxar/maprules/blob/master/maprules.apidocs.md)
 
 #### Contributing
@@ -29,7 +29,7 @@ The goal of MapRules is to simplify OpenStreetMap feature tagging and validation
 - [Tasking Manager 2 Fork](https://github.com/radiant-maxar/osm-tasking-manager2/tree/maprules-dev)
 
 
-...see the [Architecture](https://github.com/maprules/maprules/blob/master/ARCHITECTURE.md) for a technical decsription of the repos work together
+...see the [Architecture](https://github.com/radiant-maxar/maprules/blob/develop/ARCHITECTURE.md) for a technical description of the repos work together
 
 ## Getting Started
 
