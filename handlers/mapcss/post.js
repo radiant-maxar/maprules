@@ -10,8 +10,7 @@ module.exports = async (r, h) => {
         return h.response(rulesMapCSS).header('Content-Type', 'application/json').code(200);
 
     } catch (error) {
-        return Boom.badImplementation(error.message);
-
+        return Boom.boomify(error, { statusCode: 400 });
     }
 
 };

@@ -5,6 +5,9 @@ module.exports = {
     path: '/mapcss',
     config: {
         handler: require('../../handlers/mapcss').post,
-        cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] }
+        cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] },
+        validate: {
+    		failAction: async (request, h, err) => err
+        }
     }
 };
