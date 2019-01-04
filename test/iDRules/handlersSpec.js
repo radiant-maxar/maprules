@@ -11,7 +11,7 @@ const get = require('../../routes/iDRules').get;
 module.exports = () => {
     before(async () => await server.liftOff(get));
     describe('get', () => {
-        it('returns 200 and JSON of parsd MapCSS Rules if id param in database', async () => {
+        it('returns 200 and JSON of parsed MapCSS Rules if id param in database', async () => {
             const request = mergeDefaults({
                     method: 'GET',
                     url: `/config/${seedId}/rules/iD`

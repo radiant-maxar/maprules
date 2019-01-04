@@ -229,6 +229,22 @@
  * 
  */
 
+
+/**
+ * @api {post} /mapcss Convert MapCSS Validation Rule to JSON
+ * @apiName MapCssToJson
+ * @apiGroup mapcss
+ * 
+ * @apiVersion 0.0.2
+ * 
+ * @apiExample {curl} Example Usage
+ *      curl -H "Content-Type: text/html" -X POST -d 'node[healthcare=yes][!name]{ throwError: \"'healthcare' preset must include name\"; } way[healthcare=yes][!name]:closed{ throwError: \"'healthcare' preset must include name\"; }'
+ * 
+ * @apiSuccessExample {json} Success-Response
+ *      [{\"geometry\":\"node\",\"equals\":{\"healthcare\":\"yes\"},\"absence\":\"name\",\"error\":\"'healthcare' preset must include name\"},{\"geometry\":\"closedway\",\"equals\":{\"healthcare\":\"yes\"},\"absence\":\"name\",\"error\":\"'healthcare' preset must include name\"}]
+ * 
+ */
+
 /**
  * @api {get} /config/:id/rules/iD Get json equivalent MapCSS rules for a given MapRules config
  * @apiName GetiDRules
