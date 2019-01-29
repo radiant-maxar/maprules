@@ -56,7 +56,7 @@
     ]
 }
 ```
-<br/>
+
 ### Config schema
 ```
 {
@@ -71,7 +71,7 @@
 |       name       | String | MapRules project name.                                         |
 |      presets     | Array  | Array of MapRules preset/validation rule configuration objects |
 | disabledFeatures | Array  | Array of disabled tags (tags not to be mapped)                 |
-<br/>
+
 ### Disabled Features schema
 ```
 "disabledFeatures": [
@@ -117,7 +117,6 @@
     ]
 }
 ```
-
 |    key   | value  | description                                                                |
 |:--------:|--------|----------------------------------------------------------------------------|
 |  fields  | Array  | Array of MapRules preset fields/validaiton selector configuration objects. |
@@ -162,7 +161,7 @@
 |     label    | String | Label for user interface                              |
 |  placeholder | String | Placeholder for user interface input                  |
 |    values    | Array  | field values that drive preset & validation selectors |
-<br/>
+
 ### Values schema
 |       key       | value  | description                                                                  |
 |:---------------:|--------|------------------------------------------------------------------------------|
@@ -176,7 +175,7 @@
 |   0   | A feature **must not** have this key. When key present, throw an error. |      error      |
 |   1   | A feature ***must** have this key. When key absent, throw error.        |      error      |
 |   2   | A feature **may** have, but is not required to have, this key.          |     warning     |
-<br/>
+
 ### Value Condition schema 
 
 | value | description                                                             | validation type |
