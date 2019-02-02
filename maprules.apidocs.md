@@ -7,19 +7,19 @@ Custom mapping presets and validation rules
 	- [Get MapRules config](#get-maprules-config)
 	- [Post MapRules config](#post-maprules-config)
 	- [Put updated MapRules config](#put-updated-maprules-config)
-	
+
 - [Docs](#docs)
 	- [MapRules validation rule scenarios](#maprules-validation-rule-scenarios)
 	- [MapRules configuration specification](#maprules-configuration-specification)
-	
+
 - [JOSM](#josm)
 	- [Get JOSM preset xml for given MapRules config](#get-josm-preset-xml-for-given-maprules-config)
 	- [Get MapCSS rules for a given MapRules config](#get-mapcss-rules-for-a-given-maprules-config)
-	
+
 - [iD](#id)
 	- [Get iD Presets for a given MapRules Config](#get-id-presets-for-a-given-maprules-config)
 	- [Get json equivalent MapCSS rules for a given MapRules config](#get-json-equivalent-mapcss-rules-for-a-given-maprules-config)
-	
+
 
 
 # <a name='config'></a> Config
@@ -87,24 +87,24 @@ Success-Response
                        "values": []
                    }
                ],
-               "geometry": ["node", "area"],
+               "geometry": ["point", "area"],
                "name": "Water Tap",
                "primary": [
-                   { 
-                       "key": "amenity", 
-                       "val": "drinking_water" 
+                   {
+                       "key": "amenity",
+                       "val": "drinking_water"
                    },
-                   { 
-                       "key": "man_made", 
-                       "val": "water_tap" 
+                   {
+                       "key": "man_made",
+                       "val": "water_tap"
                    }
                ]
            }
        ],
        "disabledFeatures": [
-           { 
-               "key": "amenity", 
-               "val": ["school", "clinic"] 
+           {
+               "key": "amenity",
+               "val": ["school", "clinic"]
            }
        ]
 }
@@ -145,7 +145,7 @@ Error-Response: id parameter does not match uuid v4 schema
 Example Usage
 
 ```
-curl -H "Content-Type: application/json" -X POST -d '{"name":"Public Health Campaign","presets":[{"fields":[{"keyCondition":"1","key":"opening_hours","label":"Hours of Operation","placeholder":"24/7","values":[{"valCondition":2,"values":["24/7","sunrise_sunset"]}]},{"keyCondition":1,"key":"height","values":[{"valCondition":5,"values":["0"]}]},{"keyCondition":1,"key":"name","values":[]}],"geometry":["node","area"],"name":"Water Tap","primary":[{"key":"amenity","val":"drinking_water"},{"key":"man_made","val":"water_tap"}]}],"disabledFeatures":[{"key":"amenity","val":["school","clinic"]}]}'
+curl -H "Content-Type: application/json" -X POST -d '{"name":"Public Health Campaign","presets":[{"fields":[{"keyCondition":"1","key":"opening_hours","label":"Hours of Operation","placeholder":"24/7","values":[{"valCondition":2,"values":["24/7","sunrise_sunset"]}]},{"keyCondition":1,"key":"height","values":[{"valCondition":5,"values":["0"]}]},{"keyCondition":1,"key":"name","values":[]}],"geometry":["point","area"],"name":"Water Tap","primary":[{"key":"amenity","val":"drinking_water"},{"key":"man_made","val":"water_tap"}]}],"disabledFeatures":[{"key":"amenity","val":["school","clinic"]}]}' http://localhost:3000/config
 ```
 
 
@@ -160,7 +160,7 @@ Success-Response
 
 ### Error Response
 
-Error-Response: payload does not match MapRules config schema 
+Error-Response: payload does not match MapRules config schema
 
 ```
 {"statusCode":400,"error":"Bad Request","message":'child "presets" fails because ["presets" at position 0 fails because [child "fields" fails because ["fields" at position 1 fails because [child "keyCondition" fails because ["keyCondition" less than or equal to 6]]]]]'}
@@ -186,7 +186,7 @@ Error-Response: payload does not match MapRules config schema
 Example Usage
 
 ```
-curl -H "Content-Type: application/json" -X PUT -d 'Content-Type: application/json" -X POST -d '{"project":"Public Health Campaign","presets":[{"fields":[{"keyCondition":1,"key":"opening_hours","label":"Hours of Operation","placeholder":"24/7, sunrise to sunset...","values":{"suggested":[{"val":"24/7","name":"always open"},{"val":"sunrise to sunset"}]}},{"keyCondition":1,"key":"height","values":{"numeric":{"greaterThan":2}}},{"keyCondition":1,"key":"name","values":{}}],"geometry":["node"],"name":"Water Tap","primary":[{"key":"amenity","val":"drinking_water"},{"key":"man_made","val":"water_tap"}]}],"disabledFeatures":[{"key":"amenity","val":"school"}]}' http://localhost:3000/config/a1035b4b-2580-4dfa-bf42-9ffb94d1690d
+curl -H "Content-Type: application/json" -X PUT -d 'Content-Type: application/json" -X POST -d '{"project":"Public Health Campaign","presets":[{"fields":[{"keyCondition":1,"key":"opening_hours","label":"Hours of Operation","placeholder":"24/7, sunrise to sunset...","values":{"suggested":[{"val":"24/7","name":"always open"},{"val":"sunrise to sunset"}]}},{"keyCondition":1,"key":"height","values":{"numeric":{"greaterThan":2}}},{"keyCondition":1,"key":"name","values":{}}],"geometry":["point"],"name":"Water Tap","primary":[{"key":"amenity","val":"drinking_water"},{"key":"man_made","val":"water_tap"}]}],"disabledFeatures":[{"key":"amenity","val":"school"}]}' http://localhost:3000/config/a1035b4b-2580-4dfa-bf42-9ffb94d1690d
 ```
 
 
@@ -201,7 +201,7 @@ Success-Response
 
 ### Error Response
 
-Error-Response: payload does not match MapRules config schema 
+Error-Response: payload does not match MapRules config schema
 
 ```
 {"statusCode":400,"error":"Bad Request","message":'child "project" fails because ["project" is required]'}
