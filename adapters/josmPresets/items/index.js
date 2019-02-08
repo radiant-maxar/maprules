@@ -44,14 +44,18 @@ module.exports = (config) => {
         };
         preset.fields.forEach(field => {
             if (Number(field.keyCondition) !== 0) {
-                field.values.forEach(value => {
-                    const uiKey = valuesImplyCombo(value) ? 'combo' : 'text';
-                    const ui = uiKey === 'combo' ? buildCombo(field.key, value, field.label) : buildText(field.key, field.label);
-                    const uiItem = !item.hasOwnProperty(uiKey) ? [] : item[uiKey];
-                                
-                    uiItem.push(ui);
-                    item[uiKey] = uiItem;
-                });
+                if (!field.values.length) {
+                    item.text = (item.hasOwnProperty('text') ? item.text : []).concat(buildText(field.key, field.label));
+                } else {
+                    field.values.forEach(value => {
+                        const uiKey = valuesImplyCombo(value) ? 'combo' : 'text';
+                        const ui = uiKey === 'combo' ? buildCombo(field.key, value, field.label) : buildText(field.key, field.label);
+                        const uiItem = !item.hasOwnProperty(uiKey) ? [] : item[uiKey];
+                                    
+                        uiItem.push(ui);
+                        item[uiKey] = uiItem;
+                    });
+                }
             };
         });
         return item;
