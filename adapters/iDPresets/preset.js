@@ -14,7 +14,7 @@ const generics = Object.keys(ID_GENERIC_FIELDS);
 
 module.exports = (preset) => {
     const iDPreset = {
-        geometry: preset.geometry, 
+        geometry: preset.geometry.map(g => g.toLowerCase()),
         tags: getTags(preset.primary),
         icon: getIcon(preset.primary),
         name: preset.name,
@@ -44,7 +44,6 @@ module.exports = (preset) => {
                         placeholder: f.placeholder || '...'
                     }
                 };
-                        
                 if (f.values.length) {
                     f.values.forEach(value => {
                         if (value.valCondition === 0) {
