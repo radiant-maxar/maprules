@@ -12,8 +12,10 @@ module.exports = async (r, h) => {
 
         const query = await db('presets').select('preset').where({ id: uuid });
         const config = JSON.parse(query[0].preset);
-        const rulesMapCSS = parseMapCSS(adaptRules(config));
-        return h.response(rulesMapCSS).header('Content-Type', 'application/json').code(200);
+        const adaptedRules = adaptRules(config);
+		const rulesMapCSS = adaptedRules.length ? parseMapCSS(adaptedRules) : [];
+		
+		return h.response(rulesMapCSS).header('Content-Type', 'application/json').code(200);
     } catch (error) {
         return error;
         
