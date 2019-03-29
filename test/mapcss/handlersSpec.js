@@ -9,7 +9,7 @@ const validMapCss = ['way[amenity=clinic][!healthcare]:closed{'
     + 'throwError: "Health Clinic preset must include healthcare"; }'];
 
 const invalidMapCss = [
-    `*[emergency=permissive] {
+    `line[emergency=permissive] {
         throwWarning: tr("{0} makes no sense", "{0.tag");
         fixAdd: "emergency=yes";
         assertMatch: "way emergency=permissive";
@@ -37,7 +37,7 @@ module.exports = () => {
                     expect(statusCode).to.equal(200);
                     const expected = [
                         {
-                            geometry:'closedway',
+                            geometry:['closedway'],
                             equals: {
                                 amenity:'clinic'
                             },
