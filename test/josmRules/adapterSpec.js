@@ -2,7 +2,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const chai = require('chai');
 const expect = chai.expect;
 
@@ -74,7 +74,7 @@ module.exports = () => {
         it('convert rulesConfig into a valid MapCSS validator file', () => {
             const file = mapCSSFiles[0];
             const validConfig = presetConfigs[0];
-            const staticPath = path.join(process.cwd(), file);
+            const staticPath = path.@hapi/join(process.cwd(), file);
             const staticMapCSS = fs.readFileSync(staticPath).toString().replace(/\s/g, '');
             const adaptedMapCSS = buildRules(validConfig).replace(/\s/g, '');
             expect(staticMapCSS).to.be.eql(adaptedMapCSS);

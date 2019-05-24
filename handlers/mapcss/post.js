@@ -1,6 +1,6 @@
 'use strict';
 const parseMapCSS = require('mapcss-parse').parse;
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 
 module.exports = async (r, h) => {
     try {

@@ -16,3 +16,4 @@ node_modules/
 .vscode/
 coverage/
 adapters/iDPresets/icons.json
+**/*.in

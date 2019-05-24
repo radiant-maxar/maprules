@@ -1,6 +1,6 @@
 'use strict';
 
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const singleFieldConditionalSchema = require('./single');
 const multipleFieldConditionalSchema = require('./multiple');
 

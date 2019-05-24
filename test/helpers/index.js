@@ -27,7 +27,7 @@ const THROW_ERROR = require('../../adapters/constants').THROW_ERROR;
 const THROW_WARNING = require('../../adapters/constants').THROW_WARNING;
 
 const expect = require('chai').expect;
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 describe('helpers', () => {
     describe('adapters', () => {
@@ -78,8 +78,8 @@ describe('helpers', () => {
                 expect(adaptEqualityToConditional(hgt, lte)).to.be.eql(buildConditional(hgt, `< ${lte.values[0]}`));
                 expect(adaptEqualityToConditional(hgt, gt)).to.be.eql(buildConditional(hgt, `>= ${gt.values[0]}`));
                 expect(adaptEqualityToConditional(hgt, gte)).to.be.eql(buildConditional(hgt, `> ${gte.values[0]}`));
-                expect(adaptEqualityToConditional(hgt, e)).to.be.eql(buildConditional(hgt, `=~/${e.values.map(v => `^${v}$`).join('|')}/`));
-                expect(adaptEqualityToConditional(hgt, ne)).to.be.eql(buildConditional(hgt, `!~/${ne.values.map(v => `^${v}$`).join('|')}/`));
+                expect(adaptEqualityToConditional(hgt, e)).to.be.eql(buildConditional(hgt, `=~/${e.values.map(v => `^${v}$`).@hapi/join('|')}/`));
+                expect(adaptEqualityToConditional(hgt, ne)).to.be.eql(buildConditional(hgt, `!~/${ne.values.map(v => `^${v}$`).@hapi/join('|')}/`));
             });
         });
         describe('adaptNumericToMessage', () => {

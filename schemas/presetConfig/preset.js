@@ -1,6 +1,6 @@
 'use strict';
 
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const fieldSchema = require('./field');
 const maprulesGeometries = require('../components').maprulesGeometries;
 const tagListSchema = require('./tagList');

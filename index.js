@@ -1,17 +1,25 @@
 'use strict';
 
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const routes = require('./routes');
+const config = require('./config')[process.env.NODE_ENV || 'development'];
+const inert = require('@hapi/inert');
+const yar = {
+    plugin: require('@hapi/yar'),
+    options: config.yar
+}
 
-const server = Hapi.server({ 
-    port: process.env.PORT || 3000, 
+const server = Hapi.server({
+    port: process.env.PORT || 3000,
     host: process.env.HOST || 'localhost',
     routes: { cors: true }
 });
 
 // initialize server
 const initServer = async () => {
-    await server.register(require('inert'));
+    await server.register(inert);
+    await server.register(yar);
+
     // add endpoints
     server.route(routes);
 

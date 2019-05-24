@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const chaiXml = require('chai-xml');
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const expect = chai.expect;
 
 chai.use(chaiXml);

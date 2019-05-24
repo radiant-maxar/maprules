@@ -109,3 +109,24 @@ docker build -f Dockerfile . && docker run maprules /bin/bash -c 'npm run test:f
 #### configure for production
 
 Edit the process.yml with desired hosts & ports...
+
+
+#### Configure process.yml
+
+MapRules uses PM2 command line tool to manage the service when running in production.
+The process.yml file acts as the configuration file for PM2.
+So, if you want to deploy your own MapRules, update the processs.yml.in...
+
+```yml
+env_production
+   NODE_ENV: production
+   PORT: ${YOUR.FAVORITE.PORT}
+   HOST: ${YOUR.FAVORITE.HOST}
+```
+
+...the build script will copy this over to the process.yml file. the .in file is 'gitignored', and as such an obfuscator of all environmental variables you want to keep secret!
+
+##### small aside about NODE_ENV
+
+NODE_ENV is the environmental variable used by `config.js` and `knexfile.js` to determine some hapi settings and most importantly the name of the sqlite db file used by the service. db files are named `maprueles_${NODE_ENV}.sqlite`.
+
