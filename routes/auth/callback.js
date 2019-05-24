@@ -2,12 +2,12 @@ const config = require('../../config')[process.env.NODE_ENV || 'development'];
 const osm = config.osmSite;
 const consumerKey = config.consumerKey;
 const consumerSecret = config.consumerSecret;
-const callbackUrl = config.callbackUrl;
 const sessionsManager = require('../../sessionsManager');
 const requestPromise = require('../../requestPromise');
 const qs = require('qs');
+const parseXML = require('xml2js').parseString;
 
-
+// const db = require()
 
 module.exports = {
     method: 'GET',
@@ -90,14 +90,32 @@ module.exports = {
                         .then(function (body) {
                             sessionsManager.remove(sessionId);
                             r.yar.clear(sessionId);
-                            console.log(body);
+
+                            return new Promise(function (resolve, reject) {
+                                parseXML(body, function (error, result) {
+                                    if (error) {
+                                        reject();
+                                    } else {
+                                        resolve(result);
+                                    }
+                                });
+                            });
                         })
+                        .then(function (userDetails) {
+                            let user = {
+                                id: userDetails.osm.user[0]['$'].id,
+                                name: userDetails.osm.user[0]['$'].display_name
+                            };
+
+                            // if in db, see if session
+
+                        });
 
                 })
                 .then(function () {
                     return h.response({ you_are: 'loggedIn' }).code(200);
                 })
-                .catch(function (error) {
+                .catch(function (err) {
                     throw err;
                 });
         }

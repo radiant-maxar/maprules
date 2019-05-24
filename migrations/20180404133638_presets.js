@@ -5,9 +5,9 @@ exports.up = function(knex, Promise) {
         CREATE TABLE \`presets\` (
             \`id\` uuid not null primary key,
             \'preset\' JSON1
-        )
+        );
     `);
-    
+
 };
 
 exports.down = function(knex, Promise) {
