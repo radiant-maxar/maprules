@@ -215,17 +215,17 @@ describe('serialize', () => {
 
             const merged = mergePresets(test);
             expect(merged.length).to.eql(1);
-  
+
             const healthClinic = merged[0];
 
             expect(healthClinic.geometry).to.eql(['point', 'area']);
-            
-            // just a wierd way to do deep checking? 
-            // see that at each level the condition + import values 
+
+            // just a wierd way to do deep checking?
+            // see that at each level the condition + import values
             // matches what the input merge-able presets have...
             expect(healthClinic.primary.map(p => `${p.key}:${p.val}`)).to.eql(['healthcare:public','amenity:clinic']);
             expect(healthClinic.fields.map(f => `${f.key}:${f.keyCondition}`)).to.eql(['source:1', 'floors:1', 'building:1']);
-            const valuesString = flattenElements(healthClinic.fields.map(f => f.values.map(v => `${v.values.@hapi/join(':')}:${v.valCondition}`)));
+            const valuesString = flattenElements(healthClinic.fields.map(f => f.values.map(v => `${v.values.join(':')}:${v.valCondition}`)));
             expect(valuesString).to.eql(['american_red_cross:missing_maps:1', '4:3', '1:5', 'house:yes:1']);
         });
         it('does not merge presets when meaningful properties do not match', () => {

@@ -4,7 +4,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const server = require('../server');
 const uuidv4 = require('uuid/v4');
-const seedId = require('../../testData/seeds')[0].id;
+const seedId = require('../../testData/seeds').presets[0].id;
 const mergeDefaults = require('../mergeDefaults');
 const get = require('../../routes/iDRules').get;
 

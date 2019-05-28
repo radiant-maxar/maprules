@@ -55,7 +55,7 @@
     "dayjs": "^1.8.14",
     "id-area-keys": "^2.11.0",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.14.6",
+    "knex": "^0.16.5",
     "mapcss-parse": "github:radiant-maxar/mapcss-parse#develop",
     "path": "^0.12.7",
     "pm2": "^2.10.3",

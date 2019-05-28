@@ -6,7 +6,7 @@ const expect = chai.expect;
 const server = require('../server');
 const uuidv4 = require('uuid/v4');
 const seeds = require('../../testData/seeds');
-const id = seeds[0].id;
+const id = seeds.presets[0].id;
 const mergeDefaults = require('../mergeDefaults');
 const get = require('../../routes/iDPresets').get;
 
@@ -21,7 +21,7 @@ module.exports = () => {
                 r = await server.inject(request),
                 iDPresets = r.result,
                 statusCode = r.statusCode;
-            
+
             expect(statusCode).to.equal(200);
             expect(iDPresets).not.to.be.null;
 

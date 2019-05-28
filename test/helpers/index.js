@@ -15,7 +15,7 @@ const getIcon = require('../../adapters/iDPresets/helpers').getIcon;
 // josm preset helpers
 const inferJosmGeometries = require('../../adapters/josmPresets/helpers').inferJosmGeometries;
 const josmGeometries = require('../../schemas/components').josmGeometries;
-// geometry ~ osm type constants 
+// geometry ~ osm type constants
 const NODE = require('../../adapters/constants').NODE;
 const WAY = require('../../adapters/constants').WAY;
 const CLOSEDWAY = require('../../adapters/constants').CLOSEDWAY;
@@ -78,8 +78,8 @@ describe('helpers', () => {
                 expect(adaptEqualityToConditional(hgt, lte)).to.be.eql(buildConditional(hgt, `< ${lte.values[0]}`));
                 expect(adaptEqualityToConditional(hgt, gt)).to.be.eql(buildConditional(hgt, `>= ${gt.values[0]}`));
                 expect(adaptEqualityToConditional(hgt, gte)).to.be.eql(buildConditional(hgt, `> ${gte.values[0]}`));
-                expect(adaptEqualityToConditional(hgt, e)).to.be.eql(buildConditional(hgt, `=~/${e.values.map(v => `^${v}$`).@hapi/join('|')}/`));
-                expect(adaptEqualityToConditional(hgt, ne)).to.be.eql(buildConditional(hgt, `!~/${ne.values.map(v => `^${v}$`).@hapi/join('|')}/`));
+                expect(adaptEqualityToConditional(hgt, e)).to.be.eql(buildConditional(hgt, `=~/${e.values.map(v => `^${v}$`).join('|')}/`));
+                expect(adaptEqualityToConditional(hgt, ne)).to.be.eql(buildConditional(hgt, `!~/${ne.values.map(v => `^${v}$`).join('|')}/`));
             });
         });
         describe('adaptNumericToMessage', () => {

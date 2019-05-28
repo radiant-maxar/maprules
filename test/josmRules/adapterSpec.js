@@ -39,7 +39,7 @@ module.exports = () => {
 
                 fields.forEach((field) => {
 
-                    buildTagChecks(field, primary, presetName, configName).forEach((tagCheck) => {                    
+                    buildTagChecks(field, primary, presetName, configName).forEach((tagCheck) => {
                         const validation = Joi.validate(tagCheck, tagChecksSchema);
                         expect(validation.value).to.be.deep.equal(tagCheck);
                         expect(validation.error).to.be.null;
@@ -51,7 +51,7 @@ module.exports = () => {
         it('catches invalid presets', () => {
             let invalidPresetConfig = presetConfigs[1];
             let configName = invalidPresetConfig.name;
-            
+
             let primary = invalidPresetConfig.presets[0].primary;
             let presetName = invalidPresetConfig.presets[0].name;
             let testField = invalidPresetConfig.presets[0].fields[0];
@@ -74,16 +74,16 @@ module.exports = () => {
         it('convert rulesConfig into a valid MapCSS validator file', () => {
             const file = mapCSSFiles[0];
             const validConfig = presetConfigs[0];
-            const staticPath = path.@hapi/join(process.cwd(), file);
+            const staticPath = path.join(process.cwd(), file);
             const staticMapCSS = fs.readFileSync(staticPath).toString().replace(/\s/g, '');
             const adaptedMapCSS = buildRules(validConfig).replace(/\s/g, '');
             expect(staticMapCSS).to.be.eql(adaptedMapCSS);
         });
         it('builds a MapCSS rule when fieldConditional is not present', () => {
-            const input = { 
+            const input = {
                 toThrow: 'throwError',
                 base: '[highway=yes]',
-                message: 'highway cannot be coupled with yes' 
+                message: 'highway cannot be coupled with yes'
             };
             const expectation = 'node[highway=yes]{throwError:"highway cannot be coupled with yes";}'.replace(/\s/g,'');
             expect(buildMapCSSRule(input, 'node').replace(/\n/g,'').replace(/\s+/g,'')).to.be.eql(expectation);

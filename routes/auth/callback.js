@@ -11,7 +11,6 @@ const uuid = require('uuid/v4');
 const dayjs = require('dayjs');
 const jwt = require('jsonwebtoken');
 
-
 module.exports = {
     method: 'GET',
     path: '/auth/callback',

@@ -15,6 +15,20 @@ module.exports = {
             }
         },
         jwt: process.env.JWT || ''
+    },
+    'testing': {
+        injectDefaults: { simulate: { error: false }}, // hapi configuration...
+        consumerKey: process.env.CONSUMER_KEY || '',
+        consumerSecret: process.env.CONSUMER_SECRET || '',
+        callbackUrl: `${host}:${port}/auth/callback`,
+        osmSite: process.env.OSM_SITE || '',
+        yar: {
+            cookieOptions: {
+                password: process.env.YAR, // you need to make this password. make it more than 32 chars.
+                isSecure: false
+            }
+        },
+        jwt: process.env.JWT || ''
     }
 };
 
