@@ -13,7 +13,8 @@ module.exports = {
                 password: process.env.YAR, // you need to make this password. make it more than 32 chars.
                 isSecure: false
             }
-        }
+        },
+        jwt: process.env.JWT || ''
     }
 };
 
