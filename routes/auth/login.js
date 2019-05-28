@@ -27,6 +27,7 @@ module.exports = {
     path: '/auth/login',
     config: {
         handler: function (r, h) {
+            if (!config.jwt.length) throw error;
             return requestPromise(requestTokenConfig)
                 .then(function (body) {
                     let tokenResponse;

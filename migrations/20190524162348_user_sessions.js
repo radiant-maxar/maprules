@@ -2,6 +2,7 @@
 exports.up = function (knex, Promise) {
     return knex.schema.createTable('user_sessions', function (table) {
         table.string('id').primary().notNullable();
+        table.timestamp('created_at').defaultTo(knex.fn.now());
         table.integer('user_id').unsigned().notNullable();
         table.foreign('user_id').references('id').inTable('users');
     });

@@ -6,8 +6,11 @@ const sessionsManager = require('../../sessionsManager');
 const requestPromise = require('../../requestPromise');
 const qs = require('qs');
 const parseXML = require('xml2js').parseString;
+const db = require('../../connection');
+const uuid = require('uuid/v4');
+const dayjs = require('dayjs');
+const jwt = require('jsonwebtoken');
 
-// const db = require()
 
 module.exports = {
     method: 'GET',
@@ -101,19 +104,58 @@ module.exports = {
                                 });
                             });
                         })
-                        .then(function (userDetails) {
-                            let user = {
+                        .then(async function (userDetails) {
+                            let details = {
                                 id: userDetails.osm.user[0]['$'].id,
                                 name: userDetails.osm.user[0]['$'].display_name
                             };
 
-                            // if in db, see if session
+                            try {
 
+                                let user = await db('users').where('id', details.id);
+                                let sessionId;
+                                let decodedJWT = {
+                                    id: details.id,
+                                    name: details.name
+                                };
+
+                                if (!user.length) { // if new user, insert into db and make new session jwt
+                                    await db('users').insert(details);
+                                    decodedJWT.session = uuid();
+                                    await db('user_sessions').insert({
+                                        id: decodedJWT.session,
+                                        user_id: details.id,
+                                        created_at: new Date()
+                                    });
+                                    // sessionHash = 'generated';
+                                } else { // if old, then see if session is old, and make new one if needed...
+                                    let session = await db('user_sessions').where('user_id', details.id);
+                                    if (session.length) {
+                                        if (dayjs(session.createdAt).diff(dayjs(Date.now()), 'hours') > 8) {
+                                            decodedJWT.session = uuid();
+                                            await db('user_sessions').insert('id', decodedJWT.session);
+                                        } else {
+                                            decodedJWT.session = session.id;
+                                        }
+                                    } else {
+                                        decodedJWT.session = uuid();
+                                        await db('user_sessions').insert({
+                                            id: decodedJWT.session,
+                                            user_id: details.id,
+                                            created_at: new Date()
+                                        });
+                                    }
+                                }
+
+                                return decodedJWT;
+                            } catch (error) {
+                                throw error;
+                            }
                         });
-
                 })
-                .then(function () {
-                    return h.response({ you_are: 'loggedIn' }).code(200);
+                .then(function (decodedJWT) {
+                    const signedToken = jwt.sign(decodedJWT, config.jwt);
+                    return h.response(signedToken).code(200);
                 })
                 .catch(function (err) {
                     throw err;
