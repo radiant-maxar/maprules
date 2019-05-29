@@ -1,80 +1,18 @@
 'use strict';
 
-const config = require('../../config')[process.env.NODE_ENV || 'development'];
-
 const uuidSchema = require('../../schemas/components').uuid;
 const presetConfigSchema = require('../../schemas/presetConfig');
-
 const Boom = require('@hapi/boom');
-const Joi = require('@hapi/joi');
-
 const db = require('../../connection');
 const ensureExtant = require('../../handlers/helpers').ensureExtant;
-
-const jwt = require('jsonwebtoken');
-const dayjs = require('dayjs');
 const uuid4 = require('uuid/v4');
 
-/**
- * true when token is no longer valid.
- * @param {Date} timestamp timestamp when session token was created
- */
-function outOfDate(timestamp) {
-    return dayjs(timestamp).diff(Date.now(), 'hours') > 8;
-}
-
-/**
- * Makes sure session id exists and is not 'out of date', as well as sees that token user exists in DB
- * @param {object} token JSON Web token
- * @return {boolean} true when both user and session id are valid.
- */
-async function canModify(token) {
-    let session = await db('user_sessions').where('id', token.session);
-    if (!session.length) {
-        throw err;
-    }
-
-    if (outOfDate(session[0].created_at)) { // remove expired session record...
-        await db('user_sessions').delete().where({ id: token.session, user_id: token.user_id });
-        throw err;
-    }
-
-    let user = await db('users').where('id', token.id);
-    if (!user.length) {
-        throw err;
-    }
-    return;
-}
-
-/**
- * Decodes JSON Web Token from its encrypted version provided by HTTP request
- * @param {string} authorizationHeader HTTP authorization header that includes JWT
- * @return {object} parsed JWT that includes session id, user id, and user name
- */
-function getToken(authorizationHeader) {
-    return jwt.verify(authorizationHeader.replace('Bearer ', ''), config.jwt);
-}
-
-/**
- * Ensures JWT provided in authorization header is valid
- * @param {object} headers object holding http request headers
- * @return {boolean} true when correct header is present, represents currently valid JWT, and user that exists in DB
- */
-async function JWTValidation(headers) {
-    let authorizationHeader = headers.authorization;
-    if (!authorizationHeader) {
-        throw err;
-    }
-
-    let token = getToken(authorizationHeader);
-    await canModify(token);
-    return;
-}
 
 
 module.exports = {
     get: {
         method: 'GET',
+        options: { auth: 'false' },
         path: '/config/{id}',
         config: {
             handler: async function(r, h) {
@@ -114,7 +52,6 @@ module.exports = {
 
             },
             validate: {
-                headers: JWTValidation,
                 payload: presetConfigSchema,
                 params: { id: uuidSchema },
                 failAction: async (request, h, err) => err
@@ -144,7 +81,6 @@ module.exports = {
             },
             cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] },
             validate: {
-                headers: JWTValidation,
                 payload: presetConfigSchema,
                 failAction: async (request, h, err) => err
             }

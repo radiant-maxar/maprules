@@ -3,8 +3,11 @@
 const Hapi = require('@hapi/hapi');
 const config = require('../config')['development'];
 const host = config.host;
+const jwtScheme = require('../jwtScheme');
 const server = Hapi.server({ port: 3001, host: host });
 
+server.auth.scheme('jwt', jwtScheme);
+server.auth.strategy('default', 'jwt');
 
 server.liftOff = async (route) => {
     try {

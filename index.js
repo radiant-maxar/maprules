@@ -4,16 +4,17 @@ const Hapi = require('@hapi/hapi');
 const routes = require('./routes');
 const config = require('./config')[process.env.NODE_ENV || 'development'];
 const inert = require('@hapi/inert');
-const yar = {
-    plugin: require('@hapi/yar'),
-    options: config.yar
-}
+const yar = { plugin: require('@hapi/yar'),  options: config.yar }
+const jwtScheme = require('./jwtScheme');
 
 const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: process.env.HOST || 'localhost',
     routes: { cors: true }
 });
+
+server.auth.scheme('jwt', jwtScheme);
+server.auth.strategy('default', 'jwt');
 
 // initialize server
 const initServer = async () => {
