@@ -1,7 +1,7 @@
 'use strict';
 
-const config = require('../../config')[process.env.NODE_ENV || 'development'];
-const db = require('../../connection');
+const config = require('./config')[process.env.NODE_ENV || 'development'];
+const db = require('./connection');
 const Boom = require('@hapi/boom');
 const jwt = require('jsonwebtoken');
 const dayjs = require('dayjs');
@@ -19,11 +19,9 @@ function outOfDate(timestamp) {
  * @param {string} authorizationHeader HTTP authorization header that includes JWT
  * @return {object} parsed JWT that includes session id, user id, and user name
  */
-function getToken(authorizationHeader) {
-    return authorizationHeader.length
-        ? jwt.verify(authorizationHeader.replace('Bearer ', ''), config.jwt)
-        : authorizationHeader;
-}
+// function getToken(authorizationHeader) {
+
+// }
 
 /**
  * Ensures JWT provided in authorization header is valid
@@ -65,11 +63,12 @@ function isAuthorized(token) {
 
 async function jwtAuthentication(request, h) {
     try {
-        let token = getToken(request.headers.authorization);
-        if (!token.length) {
+        let authorizationHeader = request.headers.authorization;
+        if (!authorizationHeader || !authorizationHeader.length) {
             throw Boom.unauthorized(null, 'Custom');
         }
 
+        let token = jwt.verify(authorizationHeader.replace('Bearer ', ''), config.jwt);
         let authorized = await isAuthorized(token);
         if (!authorized) {
             throw Boom.unauthorized(null, 'Custom');
@@ -81,9 +80,11 @@ async function jwtAuthentication(request, h) {
     }
 }
 
-export function scheme(server, options) {
+function scheme(server, options) {
     return {
         api: { settings: 5 },
         authenticate: jwtAuthentication
     };
 }
+
+module.exports = scheme;
