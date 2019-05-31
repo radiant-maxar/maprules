@@ -6,21 +6,32 @@ const Boom = require('@hapi/boom');
 const db = require('../../connection');
 const ensureExtant = require('../../handlers/helpers').ensureExtant;
 const uuid4 = require('uuid/v4');
-
+const authenticate = require('../../jwtScheme').authenticate;
 
 
 module.exports = {
     get: {
         method: 'GET',
         options: { auth: 'false' },
-        path: '/config/{id}',
+        path: '/config/{user_name}/{id}',
         config: {
             handler: async function(r, h) {
                 try {
-                    const uuid = r.params.id;
-                    await ensureExtant(uuid);
+                    const { user_name, id } = r.params;
+                    const results = await db.select('id')
+                        .from('presets')
+                        .where('name', user_name);
 
-                    const query = await db.select('preset').from('presets').where({id: uuid});
+                    if (!results.length) throw new Error('User does not exist');
+
+                    const userId = results[0];
+
+                    await ensureExtant(id, userId);
+
+                    const query = await db.select('preset')
+                        .from('presets')
+                        .where({ id: id, user_id: userId });
+
                     const config = JSON.parse(query[0].preset);
                     return h.response(config).code(200);
                 } catch (error) {
@@ -32,18 +43,22 @@ module.exports = {
             response: { schema: presetConfigSchema }
         }
     },
-    put: {
+    put: authenticate({
         method: 'PUT',
-        path: '/config/{id}',
+        path: '/config/{user_name}/{id}',
         config: {
             handler: async function (r, h) {
                 try {
+                    const token = r.auth.credentials;
                     const id = r.params.id;
                     await ensureExtant(id);
 
-                    const presets = r.payload;
+                    const preset = r.payload;
 
-                    await db.raw(`UPDATE presets SET preset = json('${JSON.stringify(presets)}') WHERE id = '${id}'`);
+                    await db('presets')
+                        .where({ id: id, user_id: token.id })
+                        .update({ preset: JSON.stringify(preset) });
+
                     return h.response({ update: 'successful' }).code(200);
 
                 } catch (error) {
@@ -58,14 +73,14 @@ module.exports = {
             },
             cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] }
         }
-    },
-    post: {
+    }),
+    post: authenticate({
         method: 'POST',
         path: '/config',
         config: {
             handler: async function(r, h) {
                 try {
-                    const token = getToken(r.headers.authorization);
+                    const token = r.auth.credentials;
                     const presets = r.payload;
                     const uuid = uuid4();
 
@@ -85,5 +100,5 @@ module.exports = {
                 failAction: async (request, h, err) => err
             }
         }
-    }
+    })
 };

@@ -9,9 +9,12 @@ const Boom = require('@hapi/boom');
  * @param {String} id string uuid of (potentially) a row in the db
  * @return {} empty promise when id found, rejected promise when not found.
  */
-module.exports = (id) => {
+module.exports = (id, userId) => {
     return new Promise(async (resolve, reject) => {
-        const extant = (await db.count('id').from('presets').where('id', id))[0]['count(`id`)'] > 0;
+        const where = { id: id };
+        if (userId) where.user_id = userId;
+        const result = await db.count('id').from('presets').where(where);
+        const extant = result[0]['count(`id`)'] > 0;
         if (!extant) reject(Boom.notFound());
         resolve();
     });

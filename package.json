@@ -57,6 +57,8 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.16.5",
     "mapcss-parse": "github:radiant-maxar/mapcss-parse#develop",
+    "markdown-generator": "^1.1.0",
+    "markdown-styles": "^3.1.10",
     "path": "^0.12.7",
     "pm2": "^2.10.3",
     "request": "^2.88.0",

@@ -80,6 +80,9 @@ async function jwtAuthentication(request, h) {
     }
 }
 
+/**
+ * scheme used for jwt authentication strategy...
+ */
 function scheme(server, options) {
     return {
         api: { settings: 5 },
@@ -87,4 +90,16 @@ function scheme(server, options) {
     };
 }
 
-module.exports = scheme;
+/**
+ * Super small helper function to make route authenticate with JWT
+ * @param {*} route
+ */
+function authenticate(route) {
+    route.config = Object.assign(route.config || {}, { auth: 'default' });
+    return route;
+}
+
+module.exports = {
+    scheme: scheme,
+    authenticate: authenticate
+};

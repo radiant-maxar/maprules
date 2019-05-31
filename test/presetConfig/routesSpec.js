@@ -7,6 +7,7 @@ const server = require('../server');
 const uuidv4 = require('uuid/v4');
 const uuidv1 = require('uuid/v1');
 const presetConfigSchema = require('../../schemas').presetConfig;
+const uuidSchema = require('../../schemas/components').uuid;
 const mergeDefaults = require('../mergeDefaults');
 const seedData = require('../../testData/seeds');
 const seedId = seedData.presets[0].id;
@@ -160,50 +161,64 @@ module.exports = () => {
     // });
     before(async () => await server.liftOff(routes.post));
     describe('post', () => {
-        it ('replies 200 if provided presetConig is valid', async () => {
+        it ('replies 200 if provided presetConfig is valid', async () => {
             validPresetConfigs.forEach(async (validPresetConfig) => {
                 const request = mergeDefaults({
                     method: 'POST',
-                    headers: { Authorization: `Bearer ${signedToken}` },
                     payload: validPresetConfig,
                     url: '/config'
-                });
+                }, true);
+                const r = await server.inject(request);
+
+                const isAuthenticated = r.request.auth.isAuthenticated;
+                const statusCode = r.statusCode;
+                const { upload, id } = r.result;
+                const { error, value } = Joi.validate(id, uuidSchema);
+
+                /**
+                 * show that...
+                 * - we get a 200
+                 * - have authenticated w/the signed JWT
+                 * - the payload gives success response and the preset's id in the db...
+                 */
+
+                expect(statusCode).to.equal(200);
+                expect(isAuthenticated).to.be.true;
+                expect(upload).to.eql('successful');
+                expect(error).to.be.null;
+                expect(value).to.eql(id);
+            });
+        });
+        it('replies 400 if provided presetConfig is invalid', async () => {
+            invalidPresetConfigs.forEach(async (invalidPresetConfig) => {
+                const request = mergeDefaults({
+                    method: 'POST',
+                    payload: invalidPresetConfig,
+                    url: '/config'
+                }, true);
                 const r = await server.inject(request);
                 const statusCode = r.statusCode;
 
-                expect(statusCode).to.equal(200);
+                expect(statusCode).to.equal(400);
             });
-        }).timeout(Infinity);
-        // it('replies 400 if provided presetConfig is invalid', async () => {
-        //     invalidPresetConfigs.forEach(async (invalidPresetConfig) => {
-        //         const request = mergeDefaults({
-        //             method: 'post',
-        //             payload: invalidPresetConfig,
-        //             url: '/config'
-        //         });
-        //         const r = await server.inject(request);
-        //         const statusCode = r.statusCode;
+        });
+        it('replies message indicating first schema offense if presetConfig is invalid', () => {
+            invalidPresetConfigs.forEach(async (invalidPresetConfig) => {
+                try {
+                    const request = mergeDefaults({
+                        method: 'POST',
+                        payload: invalidPresetConfig,
+                        url: '/config'
+                    }, true);
+                    const r = await server.inject(request);
+                    const message = r.result.message;
 
-        //         expect(statusCode).to.equal(400);
-        //     });
-        // });
-        // it('replies message indicating first schema offense if presetConfig is invalid', () => {
-        //     invalidPresetConfigs.forEach(async (invalidPresetConfig) => {
-        //         try {
-        //             const request = mergeDefaults({
-        //                 method: 'POST',
-        //                 payload: invalidPresetConfig,
-        //                 url: '/config'
-        //             });
-        //             const r = await server.inject(request);
-        //             const message = r.result.message;
+                    expect(message).to.not.be.null;
 
-        //             expect(message).to.not.be.null;
-
-    	// 		} catch (error) {
-        //             console.error(error);
-        //         }
-        //     });
-        // });
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        });
     });
 };

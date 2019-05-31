@@ -3,7 +3,7 @@
 const Hapi = require('@hapi/hapi');
 const config = require('../config')['development'];
 const host = config.host;
-const jwtScheme = require('../jwtScheme');
+const jwtScheme = require('../jwtScheme').scheme;
 const server = Hapi.server({ port: 3001, host: host });
 
 server.auth.scheme('jwt', jwtScheme);
