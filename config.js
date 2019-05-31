@@ -3,28 +3,28 @@ const port = process.env.PORT || '3001';
 
 module.exports = {
     'development': {
-        injectDefaults: { simulate: { error: false }}, // hapi configuration...
+        injectDefaults: { simulate: { error: false }},
         consumerKey: process.env.CONSUMER_KEY || '',
         consumerSecret: process.env.CONSUMER_SECRET || '',
         callbackUrl: `${host}:${port}/auth/callback`,
         osmSite: process.env.OSM_SITE || '',
         yar: {
             cookieOptions: {
-                password: process.env.YAR, // you need to make this password. make it more than 32 chars.
-                isSecure: false
+                password: process.env.YAR, // password must be greater than 32 characters
+                isSecure: false // make true when requests are made of HTTPS
             }
         },
         jwt: process.env.JWT || ''
     },
     'testing': {
-        injectDefaults: { simulate: { error: false }}, // hapi configuration...
+        injectDefaults: { simulate: { error: false }},
         consumerKey: process.env.CONSUMER_KEY || '',
         consumerSecret: process.env.CONSUMER_SECRET || '',
         callbackUrl: `${host}:${port}/auth/callback`,
         osmSite: process.env.OSM_SITE || '',
         yar: {
             cookieOptions: {
-                password: process.env.YAR, // you need to make this password. make it more than 32 chars.
+                password: process.env.YAR,
                 isSecure: false
             }
         },
@@ -39,7 +39,8 @@ module.exports = {
  *   consumerKey - oauth key for osm website oAuth ** REQUIRED **
  *   consumerSecret - secret key for osm website oAuth ** REQUIRED **
  *   osmSite - url to osm website ** REQUIRED **
- *   yar - options for session manager...
+ *   yar - options for session manager... ** REQUIRED **
+ *   jwt - private key used to sign and decode JSON Web Tokens ** REQUIRED **
  * }
 */
 

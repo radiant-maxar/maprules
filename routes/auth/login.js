@@ -21,7 +21,6 @@ const requestTokenConfig = {
     }
 };
 
-
 module.exports = {
     method: 'GET',
     path: '/auth/login',
