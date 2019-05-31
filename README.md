@@ -122,9 +122,16 @@ env_production
    NODE_ENV: production
    PORT: ${YOUR.FAVORITE.PORT}
    HOST: ${YOUR.FAVORITE.HOST}
+   CONSUMER_KEY: ${CONSUMER.KEY.FROM.OSM.SITE},
+   CONSUMER_SECRET: ${CONSUMER.SECRET.FROM.OSM.SITE},
+   OSM_SITE: ${URL.TO.OSM}
+   YAR: ${PRIVATE.KEY.FOR.YAR},
+   JWT: ${PRIVATE.KEY.FOR.JWT}
 ```
 
 ...the build script will copy this over to the process.yml file. the .in file is 'gitignored', and as such an obfuscator of all environmental variables you want to keep secret!
+
+...also, if PM2 is not for you, just make sure these environment variables are properly set and run `npm start`
 
 ##### small aside about NODE_ENV
 

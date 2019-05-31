@@ -8,6 +8,8 @@ apps:
           CONSUMER_KEY: '',
           CONSUMER_SECRET: '',
           OSM_SITE: ''
+          YAR: '',
+          JWT: ''
       env_development:
           NODE_ENV: ''
           PORT: ''
@@ -15,6 +17,8 @@ apps:
           CONSUMER_KEY: '',
           CONSUMER_SECRET: '',
           OSM_SITE: ''
+          YAR: '',
+          JWT: ''
       env_production:
           NODE_ENV: ''
           PORT: ''
@@ -22,3 +26,5 @@ apps:
           CONSUMER_KEY: '',
           CONSUMER_SECRET: '',
           OSM_SITE: ''
+          YAR: '',
+          JWT: ''
