@@ -85,8 +85,10 @@ yarn build
 #### Migrate the db and seed it with fixture data
 
 ```
-NODE_ENV=development yarn fixture
+NODE_ENV=development JWT=${some.jwt} yarn fixture
 ```
+
+..note, the JWT value above needs to be used too whenever running the app in the same NODE_ENV.
 
 #### Spin up the server
 
