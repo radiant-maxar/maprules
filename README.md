@@ -76,7 +76,16 @@ yarn install -G sqlite3 && yarn install
 
 ### Development
 
-#### build docs & ui
+#### Get Consumer Token and Consumer Secrete Keys from a development instance of OSM Site
+
+A "development instance" of the OSM Site could be the [openstreetmap-website](https://github.com/openstreetmap/openstreetmap-website) that you clone and run on your machine, or (perhaps easier) you could be one of the development instances that OSM provides like https://master.apis.dev.openstreetmap.org
+
+
+To actually get the tokens, once you have a login for your development instance, go to the `/user/username/oauth_clients/new` web page and fill out the form. When it comes to permissions, only select the `read their user preferences` checkbox. Use Consumer Token and Consumer Secret keys provided once you submit the form for the `CONSUMER_KEY` and `CONSUMER_SECRET` environmental variables. So too should you supply the development osm site you use as the `OSM_SITE` environmental variable.
+
+#### build docs and icons lookup tables
+
+...the iD editor's presets use very nice icons. the ICON lookup table tries to match the custom maprules presets with icons made for presets with matching tags
 
 ```
 yarn build
@@ -84,58 +93,56 @@ yarn build
 
 #### Migrate the db and seed it with fixture data
 
+
 ```
 NODE_ENV=development JWT=${some.jwt} yarn fixture
 ```
 
-..note, the JWT value above needs to be used too whenever running the app in the same NODE_ENV.
+..note, the JWT value above needs to be used whenever running the app in the same NODE_ENV.
 
 #### Spin up the server
 
 ```
-yarn dev
+yarn dev // propended with all needed env variables...
 ```
 
 #### Test
 
 ```
-yarn test:fixture # tests need db w/data...
+yarn test // propended with all needed env variables...
 ```
 
 *test with docker image*
 
 ```
-docker build -f Dockerfile . && docker run maprules /bin/bash -c 'npm run test:fixture'
+docker build -f Dockerfile . && docker run MapRules /bin/bash -c 'npm run test:fixture // with needed environmental variables'
 ```
-
-#### configure for production
-
-Edit the process.yml with desired hosts & ports...
-
 
 #### Configure process.yml
 
 MapRules uses PM2 command line tool to manage the service when running in production.
-The process.yml file acts as the configuration file for PM2.
-So, if you want to deploy your own MapRules, update the processs.yml.in...
+If PM2 is for you, its certainly a great option for local development.
+
+The process.yml file acts as the configuration file for PM2, and since it holds all the kinds of secret keys, you never want to commit this to a remote branch/make it exposed outside the machine you use to run maprules.
+
+As such, and this might be overkill that can be changed in the future, the `process.yml` is built from a `process.yml.in`, which we keep gitignored.
+
+So, create a process.yml.in file and place a configuration like the one below in it, using the client keys, osm site, and secret session/jwt keys for maprules. Note, we also give a fully hydrated example for the classic development, staging, production environment set used for software in a `process.yml.example` file.
 
 ```yml
-env_production
-   NODE_ENV: production
-   PORT: ${YOUR.FAVORITE.PORT}
-   HOST: ${YOUR.FAVORITE.HOST}
-   CONSUMER_KEY: ${CONSUMER.KEY.FROM.OSM.SITE},
-   CONSUMER_SECRET: ${CONSUMER.SECRET.FROM.OSM.SITE},
-   OSM_SITE: ${URL.TO.OSM}
-   YAR: ${PRIVATE.KEY.FOR.YAR},
-   JWT: ${PRIVATE.KEY.FOR.JWT}
+apps:
+   - name: maprules
+   script: index.js
+   env_production
+      NODE_ENV: production
+      PORT: ${YOUR.FAVORITE.PORT}
+      HOST: ${YOUR.FAVORITE.HOST}
+      CONSUMER_KEY: ${CONSUMER.KEY.FROM.OSM.SITE},
+      CONSUMER_SECRET: ${CONSUMER.SECRET.FROM.OSM.SITE},
+      OSM_SITE: ${URL.TO.OSM}
+      YAR: ${PRIVATE.KEY.FOR.YAR},
+      JWT: ${PRIVATE.KEY.FOR.JWT}
 ```
 
-...the build script will copy this over to the process.yml file. the .in file is 'gitignored', and as such an obfuscator of all environmental variables you want to keep secret!
-
-...also, if PM2 is not for you, just make sure these environment variables are properly set and run `npm start`
-
-##### small aside about NODE_ENV
-
-NODE_ENV is the environmental variable used by `config.js` and `knexfile.js` to determine some hapi settings and most importantly the name of the sqlite db file used by the service. db files are named `maprueles_${NODE_ENV}.sqlite`.
+With everything in your `process.yml.in` file, run the build script again and you'll be ready to use PM2 as you need. The `prod` npm command is an example of how to get maprules running with pm2 for a configuration that matches the yml snippet above.
 
