@@ -18,6 +18,7 @@ module.exports = {
         handler: function (r, h) {
             // make sure provided oauth_token is within our session manager...
             let requestOAuthToken = r.query.oauth_token;
+            let sessionUserAgent;
             let sessionOAuthToken;
 
             let sessions = sessionsManager.all();
@@ -33,9 +34,10 @@ module.exports = {
                     throw new Error('unknown session!!!');
                     return;
                 }
-                if (!session.oauth_token === requestOAuthToken) {
+                if (!session.oauth_token === requestOAuthToken && session.user_agent !== r.headers['user-agent']) {
                     continue;
                 }
+                sessionUserAgent = session.user_agent;
                 sessionOAuthToken = session.oauth_token;
             }
 
@@ -112,7 +114,6 @@ module.exports = {
                             try {
 
                                 let user = await db('users').where('id', details.id);
-                                let sessionId;
                                 let decodedJWT = {
                                     id: details.id,
                                     name: details.name
@@ -124,25 +125,33 @@ module.exports = {
                                     await db('user_sessions').insert({
                                         id: decodedJWT.session,
                                         user_id: details.id,
+                                        user_agent: sessionUserAgent,
                                         created_at: new Date()
                                     });
-                                    // sessionHash = 'generated';
-                                } else { // if old, then see if session is old, and make new one if needed...
-                                    let session = await db('user_sessions').where('user_id', details.id);
-                                    if (session.length) {
-                                        if (dayjs(session.createdAt).diff(dayjs(Date.now()), 'hours') > 8) {
-                                            decodedJWT.session = uuid();
-                                            await db('user_sessions').insert('id', decodedJWT.session);
-                                        } else {
-                                            decodedJWT.session = session.id;
-                                        }
-                                    } else {
-                                        decodedJWT.session = uuid();
-                                        await db('user_sessions').insert({
-                                            id: decodedJWT.session,
+                                } else { // logged in user.
+                                    decodedJWT.session = uuid();
+                                    let session = await db('user_sessions')
+                                        .where({
                                             user_id: details.id,
-                                            created_at: new Date()
+                                            user_agent: sessionUserAgent
                                         });
+                                    if (session.length) { // if logging in from new client, make new session record
+                                        await db('user_sessions')
+                                            .insert({
+                                                id: decodedJWT.session,
+                                                user_agent: sessionUserAgent,
+                                                created_at: new Date()
+                                            });
+                                    } else { // update existing user-client record with new session id
+                                        await db('user_sessions')
+                                            .where({
+                                                id: session[0].id,
+                                                user_agent: sessionUserAgent
+                                            })
+                                            .update({
+                                                id: decodedJWT.session,
+                                                created_at: new Date()
+                                            });
                                     }
                                 }
 
@@ -153,13 +162,12 @@ module.exports = {
                         });
                 })
                 .then(function (decodedJWT) {
-                    const signedToken = jwt.sign(decodedJWT, config.jwt);
+                    const signedToken = jwt.sign(decodedJWT, config.jwt, { expiresIn: '8h' });
                     return h.response(signedToken).code(200);
                 })
                 .catch(function (err) {
                     throw err;
                 });
         }
-        // validate: { params: { id: uuidSchema } }
     }
 };
