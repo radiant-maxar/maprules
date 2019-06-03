@@ -9,7 +9,7 @@ module.exports = {
         method: 'POST',
         path: '/mapcss',
         config: {
-            handler: async (r, h) =>  {
+            handler: async (r, h) => {
                 try {
                     const mapcss = r.payload;
                     const rulesMapCSS = parseMapCSS(mapcss);
@@ -32,5 +32,5 @@ module.exports = {
                 failAction: async (request, h, err) => err
             }
         }
-    });
-}
+    })
+};
