@@ -12,9 +12,9 @@ const authenticate = require('../../jwtScheme').authenticate;
 module.exports = {
     get: {
         method: 'GET',
-        options: { auth: 'false' },
-        path: '/config/{user_name}/{id}',
+        path: '/config/{id}',
         config: {
+            auth: false,
             handler: async function(r, h) {
                 try {
                     const { user_name, id } = r.params;
@@ -45,7 +45,7 @@ module.exports = {
     },
     put: authenticate({
         method: 'PUT',
-        path: '/config/{user_name}/{id}',
+        path: '/config/{id}',
         config: {
             handler: async function (r, h) {
                 try {
