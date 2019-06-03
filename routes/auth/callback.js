@@ -1,3 +1,6 @@
+'use strict';
+
+const db = require('../../connection');
 const config = require('../../config')[process.env.NODE_ENV || 'development'];
 const osm = config.osmSite;
 const consumerKey = config.consumerKey;
@@ -6,9 +9,7 @@ const sessionsManager = require('../../sessionsManager');
 const requestPromise = require('../../requestPromise');
 const qs = require('qs');
 const parseXML = require('xml2js').parseString;
-const db = require('../../connection');
 const uuid = require('uuid/v4');
-const dayjs = require('dayjs');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
@@ -30,7 +31,7 @@ module.exports = {
                 session = r.yar.get(sessionId);
 
                 if (!session) {
-                    sessions.remove(sessionId);
+                    sessionsManager.remove(sessionId);
                     throw new Error('unknown session!!!');
                     return;
                 }
@@ -116,7 +117,8 @@ module.exports = {
                                 let user = await db('users').where('id', details.id);
                                 let decodedJWT = {
                                     id: details.id,
-                                    name: details.name
+                                    name: details.name,
+                                    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8)
                                 };
 
                                 if (!user.length) { // if new user, insert into db and make new session jwt
@@ -130,26 +132,24 @@ module.exports = {
                                     });
                                 } else { // logged in user.
                                     decodedJWT.session = uuid();
-                                    let session = await db('user_sessions')
-                                        .where({
-                                            user_id: details.id,
-                                            user_agent: sessionUserAgent
-                                        });
+                                    let whereAgentUser = {
+                                        user_id: details.id,
+                                        user_agent: sessionUserAgent
+                                    };
+                                    let session = await db('user_sessions').where(whereAgentUser);
                                     if (session.length) { // if logging in from new client, make new session record
                                         await db('user_sessions')
-                                            .insert({
+                                            .where(whereAgentUser)
+                                            .update({
                                                 id: decodedJWT.session,
-                                                user_agent: sessionUserAgent,
                                                 created_at: new Date()
                                             });
                                     } else { // update existing user-client record with new session id
                                         await db('user_sessions')
-                                            .where({
-                                                id: session[0].id,
-                                                user_agent: sessionUserAgent
-                                            })
-                                            .update({
+                                            .insert({
                                                 id: decodedJWT.session,
+                                                user_id: details.id,
+                                                user_agent: sessionUserAgent,
                                                 created_at: new Date()
                                             });
                                     }
@@ -162,7 +162,7 @@ module.exports = {
                         });
                 })
                 .then(function (decodedJWT) {
-                    const signedToken = jwt.sign(decodedJWT, config.jwt, { expiresIn: '8h' });
+                    const signedToken = jwt.sign(decodedJWT, config.jwt);
                     return h.response(signedToken).code(200);
                 })
                 .catch(function (err) {

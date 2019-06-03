@@ -19,5 +19,8 @@ module.exports = {
     remove: function(session) {
         const idx = sessions.indexOf(session);
         if (idx !== -1) sessions.splice(idx, 1);
+    },
+    clear: function () {
+        sessions = [];
     }
 };
