@@ -12,9 +12,13 @@ jobs:
       - run:
           name: install dependencies
           command: 'npm install --save sqlite3 && npm install'
+
       - run:
           name: build
-          command: 'npm run build'
+          command: |
+            mkdir db
+            npm run build
+
       - run:
           name: fixture
           command: 'NODE_ENV=testing npm run fixture'
