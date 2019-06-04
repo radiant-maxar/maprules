@@ -17,7 +17,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../connection');
 
 let oauthToken, oauthTokenSecret, oauthTokenUrl,
-    requestTokenResp, userXML, oauthVerifier,
+    requestTokenResp, userXML, userXML2, oauthVerifier,
     accessToken, accessTokenSecret, accessTokenResp, sessionId,
     callbackScope, callbackRequest, scope;
 
@@ -30,7 +30,8 @@ before(async () => {
     accessToken = 'PP9PatyLVkSA4ilO4GxiFCrrlaTnzPfgAvnxnp4N';
     accessTokenSecret = '1BDOcy9F2l388jvmKSAUvYhYimflz6nxURYKt6Fb';
     accessTokenResp = `oauth_token=${accessToken}&oauth_token_secret=${accessTokenSecret}`;
-    userXML = seedData.fakeUserDetail1;
+    userXML = seedData.fakeUserDetail1,
+    userXML2 = seedData.fakeUserDetail2;
 
     // set up nock
     scope = nock(osm).persist(true);
@@ -45,7 +46,7 @@ before(async () => {
         return requestTokenResp;
     });
 
-    scope.post('/oauth/access_token').times(2).reply(200, function (uri, reqBody) {
+    scope.post('/oauth/access_token').times(3).reply(200, function (uri, reqBody) {
         let authHeaders = this.req.headers.authorization,
             hasHeaders = authHeaders.includes('OAuth')
                 && authHeaders.includes('oauth_token')
@@ -152,5 +153,67 @@ describe('callback', () => {
 
         });
     });
+    it('creates a new user/user_agent record when given different user agent', function (done) {
+        let request = mergeDefaults({
+            method: 'GET',
+            headers: { 'user-agent': 'tohs' },
+            url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
+        });
 
+        server.inject(request).then(function (r) {
+            db('user_sessions').where({ user_id: 1 }).then(function (results) {
+                expect(results.length).to.eql(2);
+                expect(results[0].user_agent).to.eql('shot');
+                expect(results[1].user_agent).to.eql('tohs');
+                done();
+            });
+        });
+    });
+    it('creates a new user in users table and new session in sessions table', function (done) {
+        nock.cleanAll();
+        // mock replying the new user data...
+        scope = nock(osm);
+
+        scope.post('/oauth/access_token').times(3).reply(200, function (uri, reqBody) {
+            let authHeaders = this.req.headers.authorization,
+                hasHeaders = authHeaders.includes('OAuth')
+                    && authHeaders.includes('oauth_token')
+                    && authHeaders.includes('oauth_consumer_key');
+
+            expect(hasHeaders).to.be.true;
+            return accessTokenResp;
+        });
+
+        scope.get('/api/0.6/user/details').reply(200, function (uri, reqBody) {
+            let headers = this.req.headers,
+                contentType = headers['content-type'],
+                authHeaders = headers.authorization,
+                hasHeaders = authHeaders.includes('OAuth');
+
+            expect(contentType).to.eql('text/xml');
+            expect(hasHeaders).to.be.true;
+
+            return userXML2;
+        });
+        let request = mergeDefaults({
+            method: 'GET',
+            url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
+        });
+
+        server.inject(request).then(function (r) {
+            Promise.all([db('users'), db('user_sessions')]).then(function (results) {
+                let [users, sessions] = results;
+
+                expect(users.length).to.eql(2);
+                expect(sessions.length).to.eql(3);
+                expect(users[0].name).to.eql('test_user');
+                expect(users[1].name).to.eql('test_user_2'); // new user
+                expect(sessions.filter(function (s) { return s.user_id === 2; }).length).to.eql(1); // new user
+                expect(sessions.filter(function (s) { return s.user_id === 1; }).length).to.eql(2);
+
+                done();
+            });
+        });
+
+    });
 });
