@@ -13,7 +13,7 @@ let requestPromise = function (options) {
             }
             resolve(body);
         });
-    })
-}
+    });
+};
 
 module.exports = requestPromise;

@@ -4,7 +4,7 @@ const Hapi = require('@hapi/hapi');
 const routes = require('./routes');
 const config = require('./config')[process.env.NODE_ENV || 'development'];
 const inert = require('@hapi/inert');
-const yar = { plugin: require('@hapi/yar'),  options: config.yar }
+const yar = { plugin: require('@hapi/yar'), options: config.yar };
 const jwtScheme = require('./jwtScheme').scheme;
 
 const server = Hapi.server({

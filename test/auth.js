@@ -34,7 +34,7 @@ describe('session', () => {
             expect(r.statusCode).to.eql(200);
             done();
         });
-    })
+    });
     it('replies with 401 code when provided invalid jwt', function (done) {
         const request = mergeDefaults({
             method: 'GET',
@@ -138,12 +138,12 @@ describe('callback', () => {
         let request = mergeDefaults({
             method: 'GET',
             url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
-        })
+        });
 
         server.inject(request).then(function (r) {
             let decoded = jwt.verify(r.result, config.jwt);
             expect(decoded.id).to.eql('1');
-            expect(decoded.name).to.eql('test_user')
+            expect(decoded.name).to.eql('test_user');
             expect(decoded.session).to.not.eql(seedData.fakeToken);
 
             let exp = decoded.exp;
@@ -160,7 +160,7 @@ describe('callback', () => {
         let request = mergeDefaults({
             method: 'GET',
             url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
-        })
+        });
         db('user_sessions').where(sessionWhere).then(function (results) {
             let sessionRecord = results[0];
 

@@ -14,7 +14,7 @@ const unsignedToken = {
     id: user.id,
     name: user.name,
     session: session
-}
+};
 
 module.exports = {
     presets: [

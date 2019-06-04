@@ -23,7 +23,7 @@ const authTestRoute = {
         }
     },
     path: '/authTest'
-}
+};
 
 
 before(async () => await server.liftOff(authTestRoute));
