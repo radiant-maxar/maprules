@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build_and_test:
+  build:
     working_directory: ~/maprules
     docker:
       - image: circleci/node:10.7.0
