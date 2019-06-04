@@ -13,12 +13,13 @@ const seedData = require('../testData/seeds');
 const sessionManager = require('../sessionsManager');
 const uuid = require('uuid/v4');
 const jwt = require('jsonwebtoken');
-const dayjs = require('dayjs');
+
+const db = require('../connection');
 
 let oauthToken, oauthTokenSecret, oauthTokenUrl,
     requestTokenResp, userXML, oauthVerifier,
     accessToken, accessTokenSecret, accessTokenResp, sessionId,
-    yarGet;
+    callbackScope, callbackRequest, scope;
 
 before(async () => {
     oauthToken = '35zukjR4yCqbAmwrf2Vsk5i395KrhtiNBAOEW4C0';
@@ -30,6 +31,41 @@ before(async () => {
     accessTokenSecret = '1BDOcy9F2l388jvmKSAUvYhYimflz6nxURYKt6Fb';
     accessTokenResp = `oauth_token=${accessToken}&oauth_token_secret=${accessTokenSecret}`;
     userXML = seedData.fakeUserDetail1;
+
+    // set up nock
+    scope = nock(osm).persist(true);
+
+    scope.post('/oauth/request_token').reply('200', function (uri, reqBody) {
+        let authHeaders = this.req.headers.authorization;
+        let hasHeaders = authHeaders.includes('OAuth')
+            && authHeaders.includes('oauth_callback')
+            && authHeaders.includes('oauth_consumer_key');
+
+        expect(hasHeaders).to.be.true;
+        return requestTokenResp;
+    });
+
+    scope.post('/oauth/access_token').times(2).reply(200, function (uri, reqBody) {
+        let authHeaders = this.req.headers.authorization,
+            hasHeaders = authHeaders.includes('OAuth')
+                && authHeaders.includes('oauth_token')
+                && authHeaders.includes('oauth_consumer_key');
+
+        expect(hasHeaders).to.be.true;
+        return accessTokenResp;
+    });
+
+    scope.get('/api/0.6/user/details').times(2).reply(200, function (uri, reqBody) {
+        let headers = this.req.headers,
+            contentType = headers['content-type'],
+            authHeaders = headers.authorization,
+            hasHeaders = authHeaders.includes('OAuth');
+
+        expect(contentType).to.eql('text/xml');
+        expect(hasHeaders).to.be.true;
+
+        return userXML;
+    });
 
     return await server.liftOff(login);
 });
@@ -44,16 +80,7 @@ describe('login', () => {
             expect(r.result).to.eql(oauthTokenUrl);
             done();
         });
-
-        nock(osm)
-            .matchHeader('authorization', function (auth) {
-                return auth.includes('OAuth')
-                    && auth.includes('oauth_callback')
-                    && auth.includes('oauth_consumer_key');
-            })
-            .post('/oauth/request_token')
-            .reply('200', requestTokenResp);
-    }).timeout(Infinity);
+    });
 });
 
 before(async () => {
@@ -72,15 +99,22 @@ before(async () => {
                 return 'set';
             }
         }
-    ]
+    ];
+
     await server.liftOff(callback);
+
 });
 describe('callback', () => {
+    beforeEach(function (done) {
+
+        // create stubbed responses for requests the callback function makes to the osm site.
+        done();
+    });
     it('replies signed jwt when it receives authorized request from OSM site', function (done) {
-        const request = mergeDefaults({
+        let request = mergeDefaults({
             method: 'GET',
             url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
-        });
+        })
 
         server.inject(request).then(function (r) {
             let decoded = jwt.verify(r.result, config.jwt);
@@ -96,18 +130,27 @@ describe('callback', () => {
             done();
         });
 
-        let scope = nock(osm);
-
-        scope
-            .matchHeader('authorization', function (auth) {
-                return auth.includes('OAuth')
-                    && auth.includes('oauth_token')
-                    && auth.includes('oauth_consumer_key');
-            })
-            .matchHeader('content-type', function (type) {
-                return type ? type === 'text/xml' : true;
-            })
-            .post('/oauth/access_token').reply(200, accessTokenResp)
-            .get('/api/0.6/user/details').reply(200, userXML);
     });
+    it('updates existing user/user_agent record in user session when known user is \'logging back in \'', function (done) {
+        let sessionWhere = { user_id: 1, user_agent: 'shot' };
+        let request = mergeDefaults({
+            method: 'GET',
+            url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
+        })
+        db('user_sessions').where(sessionWhere).then(function (results) {
+            let sessionRecord = results[0];
+
+            server.inject(request).then(function (r) {
+                db('user_sessions').where(sessionWhere).then(function (results) {
+                    let updatedSessionRecord = results[0];
+                    expect(sessionRecord.user_id).to.eql(updatedSessionRecord.user_id);
+                    expect(sessionRecord.user_agent).to.eql(updatedSessionRecord.user_agent);
+                    expect(sessionRecord.id).to.not.eql(updatedSessionRecord.id);
+                    done();
+                });
+            });
+
+        });
+    });
+
 });
