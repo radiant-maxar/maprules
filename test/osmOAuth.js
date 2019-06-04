@@ -85,22 +85,21 @@ describe('login', () => {
 });
 
 before(async () => {
-    callback.config.pre = [ // add little pre method to stub session related data...
-        {
-            assign: 'yarInject',
-            method: function (r, h) {
-                sessionManager.clear();
-                sessionId = uuid();
-                sessionManager.add(sessionId);
-                r.yar.set(sessionId, {
-                    oauth_token: oauthToken,
-                    oauth_token_secret: oauthTokenSecret,
-                    user_agent: r.headers['user-agent']
-                });
-                return 'set';
-            }
+    callback.config.pre.unshift({
+        // add little pre method to stub session related data...
+        assign: 'yarInject',
+        method: function (r, h) {
+            sessionManager.clear();
+            sessionId = uuid();
+            sessionManager.add(sessionId);
+            r.yar.set(sessionId, {
+                oauth_token: oauthToken,
+                oauth_token_secret: oauthTokenSecret,
+                user_agent: r.headers['user-agent']
+            });
+            return 'set';
         }
-    ];
+    });
 
     await server.liftOff(callback);
 
