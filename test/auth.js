@@ -7,8 +7,7 @@ const expect = chai.expect;
 const nock = require('nock');
 const config = require('../config')[process.env.NODE_ENV || 'development'];
 const osm = config.osmSite;
-const login = require('../routes/auth').login;
-const callback = require('../routes/auth').callback;
+const { login, callback, session } = require('../routes/auth');
 const seedData = require('../testData/seeds');
 const sessionManager = require('../sessionsManager');
 const uuid = require('uuid/v4');
@@ -20,6 +19,36 @@ let oauthToken, oauthTokenSecret, oauthTokenUrl,
     requestTokenResp, userXML, userXML2, oauthVerifier,
     accessToken, accessTokenSecret, accessTokenResp, sessionId,
     callbackScope, callbackRequest, scope;
+
+
+
+before(async () => await server.liftOff(session));
+describe('session', () => {
+    it('replies with a 200 code when provided valid jwt', function (done) {
+        const request = mergeDefaults({
+            method: 'GET',
+            url: '/auth/session'
+        }, true);
+
+        server.inject(request).then(function (r) {
+            expect(r.statusCode).to.eql(200);
+            done();
+        });
+    })
+    it('replies with 401 code when provided invalid jwt', function (done) {
+        const request = mergeDefaults({
+            method: 'GET',
+            url: '/auth/session',
+            headers: { Authorization: 'Bearer blimblam' }
+        });
+
+        server.inject(request).then(function (r) {
+            expect(r.statusCode).to.eql(401);
+            done();
+        });
+
+    });
+});
 
 before(async () => {
     oauthToken = '35zukjR4yCqbAmwrf2Vsk5i395KrhtiNBAOEW4C0';
@@ -105,11 +134,6 @@ before(async () => {
 
 });
 describe('callback', () => {
-    beforeEach(function (done) {
-
-        // create stubbed responses for requests the callback function makes to the osm site.
-        done();
-    });
     it('replies signed jwt when it receives authorized request from OSM site', function (done) {
         let request = mergeDefaults({
             method: 'GET',
