@@ -8,17 +8,43 @@ jobs:
       - checkout
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@latest'
+          command: |
+            sudo npm install -g npm@latest
+
+      - restore_cache: # special step to restore the dependency cache
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: install dependencies
-          command: 'npm install --save sqlite3 && npm install'
+          command: |
+            npm install --save sqlite3
+            npm install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
       - run:
           name: build
-          command: 'npm run build'
+          command: |
+            mkdir db
+            npm run build
       - run:
           name: fixture
-          command: 'NODE_ENV=testing npm run fixture'
+          command: |
+            npm run fixture
+          environment:
+            NODE_ENV: testing
+            YAR: thelongestyarstringofalltimeever
+            JWT: reveemitllafognirtsraytsegnoleht
       - run:
           name: test
-          command: 'npm test'
+          command: |
+            npm test
+          environment:
+            NODE_ENV: testing
+            YAR: thelongestyarstringofalltimeever
+            JWT: reveemitllafognirtsraytsegnoleht
+            OSM_SITE: http://fake.osm.org
+            CONSUMER_KEY: keythatconsumes
+            CONSUMER_SECRET: secretkeythatconsumes
 

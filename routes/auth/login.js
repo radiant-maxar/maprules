@@ -44,7 +44,8 @@ module.exports = {
                     // save the session in our session manager...
                     r.yar.set(sessionId, {
                         oauth_token: tokenResponse.oauth_token,
-                        oauth_token_secret: tokenResponse.oauth_token_secret
+                        oauth_token_secret: tokenResponse.oauth_token_secret,
+                        user_agent: r.headers['user-agent']
                     });
 
                     return h
@@ -56,9 +57,8 @@ module.exports = {
                 })
                 .catch(function (error) {
                     console.log(error);
-                    throw new Error('BAD');
+                    throw error;
                 });
         }
-        // validate: { params: { id: uuidSchema } }
     }
 };

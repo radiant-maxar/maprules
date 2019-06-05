@@ -168,6 +168,7 @@ module.exports = () => {
                     payload: validPresetConfig,
                     url: '/config'
                 }, true);
+
                 const r = await server.inject(request);
 
                 const isAuthenticated = r.request.auth.isAuthenticated;

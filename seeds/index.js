@@ -12,7 +12,8 @@ exports.seed = async (knex) => {
         await knex('user_sessions').insert({
             id: seedData.session,
             created_at: new Date(),
-            user_id: seedData.user.id
+            user_id: seedData.user.id,
+            user_agent: seedData.fakeUserAgent
         });
 
         await knex('presets').del();

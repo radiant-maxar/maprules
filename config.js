@@ -1,6 +1,5 @@
 const host = process.env.HOST || 'http://localhost';
 const port = process.env.PORT || '3001';
-
 module.exports = {
     'development': {
         injectDefaults: { simulate: { error: false }},

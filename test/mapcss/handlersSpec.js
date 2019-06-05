@@ -28,9 +28,9 @@ module.exports = () => {
                     const request = mergeDefaults({
                         method: 'post',
                         payload: mapcss,
-                        headers: { 'Content-Type': 'text/plain'},
+                        headers: { 'Content-Type': 'text/plain' },
                         url: '/mapcss'
-                    });
+                    }, true);
                     const r = await server.inject(request);
                     const statusCode = r.statusCode;
 
@@ -59,7 +59,7 @@ module.exports = () => {
                         payload: mapcss,
                         headers: { 'Content-Type': 'text/plain'},
                         url: '/mapcss'
-                    });
+                    }, true);
                     const r = await server.inject(request);
                     const statusCode = r.statusCode;
                     expect(statusCode).to.equal(400);
