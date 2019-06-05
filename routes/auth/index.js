@@ -3,6 +3,7 @@ let authenticate = require('../../jwtScheme').authenticate;
 module.exports = {
     callback: require('./callback'),
     login: require('./login'),
+    logout: require('./logout'),
     /**
      * the jwt strategy will capture fail cases and return 401.
      * we will only ever get the the handler function if the provided jwt is considered valid.

@@ -1,26 +1,24 @@
 'use strict';
 
-const mergeDefaults = require('./mergeDefaults');
-const server = require('./server');
+const mergeDefaults = require('../mergeDefaults');
+const server = require('../server');
 const chai = require('chai');
 const expect = chai.expect;
 const nock = require('nock');
-const config = require('../config')[process.env.NODE_ENV || 'development'];
+const config = require('../../config')[process.env.NODE_ENV || 'development'];
 const osm = config.osmSite;
-const { login, callback, session } = require('../routes/auth');
-const seedData = require('../testData/seeds');
-const sessionManager = require('../sessionsManager');
+const { login, logout, callback, session } = require('../../routes/auth');
+const seedData = require('../../testData/seeds');
+const sessionManager = require('../../sessionsManager');
 const uuid = require('uuid/v4');
 const jwt = require('jsonwebtoken');
 
-const db = require('../connection');
+const db = require('../../connection');
 
 let oauthToken, oauthTokenSecret, oauthTokenUrl,
-    requestTokenResp, userXML, userXML2, oauthVerifier,
-    accessToken, accessTokenSecret, accessTokenResp, sessionId,
-    callbackScope, callbackRequest, scope;
-
-
+    requestTokenResp, userXML, userXML2,
+    oauthVerifier, accessToken, accessTokenSecret,
+    accessTokenResp, sessionId, scope;
 
 before(async () => await server.liftOff(session));
 describe('session', () => {
@@ -238,5 +236,68 @@ describe('callback', () => {
             });
         });
 
+    });
+});
+
+before(async () => server.liftOff(logout));
+describe('logout', function (done) {
+    // add a fake session
+    let sessionJWT, signedJWT, userAgent;
+    before(function (done) {
+        let sessionId = uuid();
+        userAgent = 'james_bond';
+        sessionJWT = {
+            id: 1,
+            name: 'test_user',
+            session: sessionId,
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8)
+        };
+        signedJWT = jwt.sign(sessionJWT, config.jwt);
+
+        let sessionInsert = {
+            user_id: 1,
+            id: sessionId,
+            user_agent: userAgent
+        };
+
+        db('user_sessions')
+            .insert(sessionInsert)
+            .then(function () {
+                done();
+            })
+            .catch(function (error) {
+                throw error;
+            });
+    });
+    it('removes record in user_sessions table for given jwt', function (done) {
+        let request = mergeDefaults({
+            method: 'POST',
+            url: '/auth/logout',
+            headers: { Authorization: `Bearer ${signedJWT}`, 'user-agent': 'james_bond' }
+        });
+
+        // logout with session we just made...
+        server.inject(request).then(function (r) {
+            expect(r.statusCode).to.eql(200); // we should have successfully logged out...
+            expect(r.result).to.eql('logged out');
+
+            db('user_sessions') // the session record should be removed from user_sessions table...
+                .where({ user_id: 1, user_agent: userAgent })
+                .then(function (sessions) {
+                    expect(sessions.length).to.eql(0);
+                    done();
+                });
+        });
+    });
+    it('throws 401 if trying to logout without providing token', function (done) {
+        let request = mergeDefaults({
+            method: 'POST',
+            url: '/auth/logout'
+        });
+
+        server.inject(request).then(function (r) {
+            expect(r.statusCode).to.eql(401);
+            done();
+        });
     });
 });
