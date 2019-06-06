@@ -1,19 +1,20 @@
 'use strict';
 
-const expect = require('chai').expect;
+const chai = require('chai');
+const expect = chai.expect;
 const server = require('../server');
 const uuidv4 = require('uuid/v4');
 const seedId = require('../../testData/seeds').presets[0].id;
-const mergeDefaults = require('../mergeDefaults');
-const get = require('../../routes/josmRules').get;
+const mergeDefaults = require('../helpers').mergeDefaults;
+const get = require('../../routes/iDRules').get;
 
 module.exports = () => {
     before(async () => await server.liftOff(get));
     describe('get', () => {
-        it('returns 200 and MapCSS rules if id param in database', async () => {
+        it('returns 200 and JSON of parsed MapCSS Rules if id param in database', async () => {
             const request = mergeDefaults({
                     method: 'GET',
-                    url: `/config/${seedId}/rules/JOSM`
+                    url: `/config/${seedId}/rules/iD`
                 }),
                 r = await server.inject(request),
                 rules = r.result,
@@ -26,7 +27,7 @@ module.exports = () => {
         it('returns 404 if id not in database', async () => {
             const request = mergeDefaults({
                     method: 'GET',
-                    url: `/config/${uuidv4()}/rules/JOSM`
+                    url: `/config/${uuidv4()}/rules/iD`
                 }),
                 r = await server.inject(request),
                 statusCode = r.statusCode;

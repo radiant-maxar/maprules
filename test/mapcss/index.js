@@ -1,5 +1,8 @@
 'use strict';
 
+const fixtureSession = require('../helpers').fixtureSession;
+
 describe('mapcss', () => {
-    describe('handlers', require('./handlersSpec'));
+    before(async () => await fixtureSession());
+    describe('routes', require('./routesSpec'));
 });

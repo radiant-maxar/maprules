@@ -7,7 +7,7 @@ const server = require('../server');
 const uuidv4 = require('uuid/v4');
 const seeds = require('../../testData/seeds');
 const id = seeds.presets[0].id;
-const mergeDefaults = require('../mergeDefaults');
+const mergeDefaults = require('../helpers').mergeDefaults;
 const get = require('../../routes/iDPresets').get;
 
 module.exports = () => {

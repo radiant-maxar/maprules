@@ -3,7 +3,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 const server = require('../server');
-const mergeDefaults = require('../mergeDefaults');
+const mergeDefaults = require('../helpers').mergeDefaults;
 const post = require('../../routes/mapcss').post;
 const validMapCss = ['way[amenity=clinic][!healthcare]:closed{'
     + 'throwError: "Health Clinic preset must include healthcare"; }'];
