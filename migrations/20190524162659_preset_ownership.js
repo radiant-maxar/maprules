@@ -11,7 +11,7 @@ exports.up = function (knex, Promise) {
         .then(function () { // 3. create the updated presets table with the user_id column
             return knex.schema.createTable('presets', function (table) {
                 table.uuid('id').primary().notNullable();
-                table.text('preset').notNullable();
+                table.json('preset').notNullable();
                 table.integer('user_id').defaultTo(0).notNullable();
                 table.foreign('user_id').references('id').inTable('users');
             });
@@ -32,12 +32,16 @@ exports.down = function (knex, Promise) {
     // 1. copy presets to temp table
     return knex.schema.renameTable('presets', '_presets_old')
         .then(function () { // 2. make presets with just id and presets column
-            return knex.schema.raw(
-                `CREATE TABLE 'presets' (
-                    'id' uuid not null primary key,
-                    'preset' JSON1 not null
-                );`
-            );
+            // return knex.schema.raw(
+            //     `CREATE TABLE 'presets' (
+            //         'id' uuid not null primary key,
+            //         'preset' JSON1 not null
+            //     );`
+            // );
+            return knex.schema.createTable('presets', function (table) {
+                table.uuid('id').primary().notNullable();
+                table.json('preset').notNullable();
+            });
         })
         .then(function () {
             return knex('presets').del();
