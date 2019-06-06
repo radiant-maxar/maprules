@@ -4,39 +4,37 @@ const uuidSchema = require('../../schemas/components').uuid;
 const presetConfigSchema = require('../../schemas/presetConfig');
 const Boom = require('@hapi/boom');
 const db = require('../../connection');
-const ensureExtant = require('../../handlers/helpers').ensureExtant;
 const uuid4 = require('uuid/v4');
 const authenticate = require('../../jwtScheme').authenticate;
 
+const presetExists = require('../helpers').presetExists;
 
+/**
+ * All handlers wrap knex promises in a try catch.
+ * That try catch is meant to capture any errors not related to the database interaction
+ *
+ * All database error handling uses classic then/catch error handling...
+ */
 module.exports = {
     get: {
         method: 'GET',
         path: '/config/{id}',
         config: {
             auth: false,
-            handler: async function(r, h) {
+            handler: function (r, h) {
                 try {
-                    const { user_name, id } = r.params;
-                    const results = await db.select('id')
-                        .from('presets')
-                        .where('name', user_name);
+                    const { id } = r.params;
 
-                    if (!results.length) throw new Error('User does not exist');
-
-                    const userId = results[0];
-
-                    await ensureExtant(id, userId);
-
-                    const query = await db.select('preset')
-                        .from('presets')
-                        .where({ id: id, user_id: userId });
-
-                    const config = JSON.parse(query[0].preset);
-                    return h.response(config).code(200);
+                    return presetExists(id)
+                        .then(function (results) {
+                            const config = JSON.parse(results[0].preset);
+                            return h.response(config).code(200);
+                        })
+                        .catch(function (error) {
+                            return Boom.notFound(error.message);
+                        });
                 } catch (error) {
-                    return error;
-
+                    return Boom.badImplementation(error);
                 }
             },
             validate: { params: { id: uuidSchema } },
@@ -47,24 +45,27 @@ module.exports = {
         method: 'PUT',
         path: '/config/{id}',
         config: {
-            handler: async function (r, h) {
+            handler: function (r, h) {
                 try {
                     const token = r.auth.credentials;
                     const id = r.params.id;
-                    await ensureExtant(id);
+                    const preset = JSON.stringify(r.payload);
 
-                    const preset = r.payload;
-
-                    await db('presets')
-                        .where({ id: id, user_id: token.id })
-                        .update({ preset: JSON.stringify(preset) });
-
-                    return h.response({ update: 'successful' }).code(200);
-
+                    return presetExists(id, token.id)
+                        .then(function () { // check first that to update exists, then update, otherwise throw 404 to user.
+                            return db('presets')
+                                .where({ id: id, user_id: token.id })
+                                .update('preset', preset);
+                        })
+                        .then(function(r) {
+                            return h.response({ update: 'successful' }).code(200);
+                        })
+                        .catch(function (error) {
+                            return Boom.notFound(error.message);
+                        });
                 } catch (error) {
-                    return error;
+                    return Boom.badImplementation(error);
                 }
-
             },
             validate: {
                 payload: presetConfigSchema,
@@ -78,26 +79,35 @@ module.exports = {
         method: 'POST',
         path: '/config',
         config: {
-            handler: async function(r, h) {
+            handler: function (r, h) {
                 try {
                     const token = r.auth.credentials;
                     const presets = r.payload;
                     const uuid = uuid4();
 
-                    await db('presets').insert({
-                        id: uuid,
-                        preset: JSON.stringify(presets),
-                        user_id: token.id
-                    });
-                    return h.response({ upload: 'successful', id: uuid }).code(200);
+                    return db('presets')
+                        .insert({
+                            id: uuid,
+                            preset: JSON.stringify(presets),
+                            user_id: token.id
+                        })
+                        .then(function (r) { // reply uuid used to generate the preset.
+                            return h.response({ upload: 'successful', id: uuid }).code(200);
+                        })
+                        .catch(function (error) {
+                            throw Boom.badImplementation(error.message);
+                        });
+
                 } catch (error) {
-                    return Boom.badImplementation(error.message);
+                    return Promise.reject(Boom.badImplementation(error));
                 }
             },
             cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] },
             validate: {
                 payload: presetConfigSchema,
-                failAction: async (request, h, err) => err
+                failAction: (request, h, err) => {
+                    return err;
+                }
             }
         }
     })

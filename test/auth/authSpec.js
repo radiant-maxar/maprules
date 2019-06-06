@@ -1,6 +1,6 @@
 'use strict';
 
-const mergeDefaults = require('../mergeDefaults');
+const mergeDefaults = require('../helpers').mergeDefaults;
 const server = require('../server');
 const chai = require('chai');
 const expect = chai.expect;
@@ -59,7 +59,7 @@ describe('auth', () => {
         accessTokenSecret = '1BDOcy9F2l388jvmKSAUvYhYimflz6nxURYKt6Fb';
         accessTokenResp = `oauth_token=${accessToken}&oauth_token_secret=${accessTokenSecret}`;
         userXML = seedData.fakeUserDetail1,
-            userXML2 = seedData.fakeUserDetail2;
+        userXML2 = seedData.fakeUserDetail2;
 
         // set up nock
         scope = nock(osm).persist(true);
