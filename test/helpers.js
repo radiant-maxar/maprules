@@ -13,10 +13,10 @@ exports.fixtureSession = function () {
 };
 
 
-exports.mergeDefaults = function(request, auth) {
-    request = Object.assign(injectDefaults, request);
+exports.mergeDefaults = function (request, auth) {
+    let merged = Object.assign(Object.assign({}, request), injectDefaults);
     if (auth) {
-        request.headers = Object.assign(request.headers || {}, authorizationHeader);
+        merged.headers = Object.assign(merged.headers || {}, authorizationHeader);
     }
-    return request;
+    return merged;
 };

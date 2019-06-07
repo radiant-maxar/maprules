@@ -10,7 +10,7 @@ const server = require('../server');
 const uuidv4 = require('uuid/v4');
 const seedId = require('../../testData/seeds').presets[0].id;
 const mergeDefaults = require('../helpers').mergeDefaults;
-const get = require('../../routes/josmPresets').get;
+const get = require('../../routes/josmPresets');
 
 
 module.exports = () => {

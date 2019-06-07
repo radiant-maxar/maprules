@@ -26,7 +26,6 @@ jobs:
       - run:
           name: build
           command: |
-            mkdir db
             npm run build
       - run:
           name: fixture

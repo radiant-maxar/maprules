@@ -99,7 +99,7 @@ module.exports = {
                         });
 
                 } catch (error) {
-                    return Promise.reject(Boom.badImplementation(error));
+                    return Boom.badImplementation(error);
                 }
             },
             cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] },

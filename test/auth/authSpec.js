@@ -34,18 +34,135 @@ describe('auth', () => {
                 done();
             });
         });
-        it('replies with 401 code when provided invalid jwt', function (done) {
-            const request = mergeDefaults({
+        it('replies with 401 code when provided non-jwt token in authorization header', function (done) {
+            const request = Object.assign({}, mergeDefaults({
                 method: 'GET',
                 url: '/auth/session',
                 headers: { Authorization: 'Bearer blimblam' }
+            }));
+
+            server.inject(request).then(function (r) {
+                const { statusCode, error, message } = r.result;
+                const wwwAuthenticate = r.headers['www-authenticate'];
+                expect(statusCode).to.eql(401);
+                expect(error).to.eql('Unauthorized');
+                expect(message).to.eql('invalid token provided');
+                expect(wwwAuthenticate).to.eql(`Bearer error="${message}"`);
+                done();
+            }).catch(function (error) {
+                throw error;
+            });
+
+        });
+        it('replies a 401 when the requests lacks the authorization header', function (done) {
+            const request = mergeDefaults({
+                method: 'GET',
+                url: '/auth/session'
             });
 
             server.inject(request).then(function (r) {
-                expect(r.statusCode).to.eql(401);
+                const { statusCode, error, message } = r.result;
+                const wwwAuthenticate = r.headers['www-authenticate'];
+
+                expect(statusCode).to.eql(401);
+                expect(error).to.eql('Unauthorized');
+                expect(message).to.eql('no token provided');
+                expect(wwwAuthenticate).to.eql(`Bearer error="${message}"`);
                 done();
+            }).catch(function (error) {
+                throw error;
+            });
+        });
+
+        it('replies a 401 when the jwt does not represent a session in the sessions table', function (done) {
+            const unknownJWT = jwt.sign({
+                session: uuid(),
+                id: 1,
+                name: 'test_user',
+                exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8)
+            }, config.jwt);
+
+            const request = mergeDefaults({
+                method: 'GET',
+                url: '/auth/session',
+                headers: { Authorization: `Bearer ${unknownJWT}` }
             });
 
+            server.inject(request).then(function (r) {
+                const { statusCode, error, message } = r.result;
+                const wwwAuthenticate = r.headers['www-authenticate'];
+
+                expect(statusCode).to.eql(401);
+                expect(error).to.eql('Unauthorized');
+                expect(message).to.eql('token invalid, session unknown');
+                expect(wwwAuthenticate).to.eql(`Bearer error="${message}"`);
+                done();
+            }).catch(function (error) {
+                throw error;
+            });
+
+
+        });
+        it('replies a 401 when client user agents do not match', function (done) {
+            const request = mergeDefaults({
+                method: 'GET',
+                url: '/auth/session'
+            }, true);
+
+            request.headers['user-agent'] = 'alvin_dewey';
+
+            server.inject(request).then(function (r) {
+                const { statusCode, message, error } = r.result;
+                const wwwAuthenticate = r.headers['www-authenticate'];
+
+                expect(statusCode).to.eql(401);
+                expect(error).to.eql('Unauthorized');
+                expect(message).to.eql('token invalid');
+                expect(wwwAuthenticate).to.eql(`Bearer error="${message}"`);
+                done();
+            });
+        });
+        it('replies a 401 when the jwt has expired', function (done) {
+            // add dummy record into user_sessions;
+            const dummyId = uuid();
+            const dummyJWT = jwt.sign({
+                session: dummyId,
+                id: 1,
+                name: 'test_user',
+                exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8)
+            }, config.jwt);
+
+            db('user_sessions')
+                .insert({
+                    id: dummyId,
+                    user_id: 1,
+                    user_agent: 'carmen_sandiego',
+                    created_at: new Date('December 17, 1995 03:24:00')
+                })
+                .then(function () {
+                    const request = mergeDefaults({
+                        method: 'GET',
+                        url: '/auth/session',
+                        headers: { Authorization: `Bearer ${dummyJWT}` }
+                    });
+
+                    server.inject(request).then(function (r) {
+                        const { statusCode, message, error } = r.result;
+                        const wwwAuthenticate = r.headers['www-authenticate'];
+
+                        expect(statusCode).to.eql(401);
+                        expect(error).to.eql('Unauthorized');
+                        expect(message).to.eql('token invalid, session expired');
+                        expect(wwwAuthenticate).to.eql(`Bearer error="${message}"`);
+
+                        db('user_sessions') // clean up the session...
+                            .where({ id: dummyId, user_id: 1 })
+                            .delete()
+                            .then(function () { done(); });
+                    });
+                }).catch(function (error) {
+                    throw error;
+                });
         });
     });
 
