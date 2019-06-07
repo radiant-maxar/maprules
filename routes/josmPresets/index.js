@@ -2,22 +2,20 @@
 
 const adaptJosmPresets = require('../../adapters').josmPresets;
 const mergePrimaries = require('../../adapters/serialize').mergePrimaries;
+const { adaptError, presetExists, validateIdPathParam } = require('../helpers');
 
-const uuidSchema = require('../../schemas/components').uuid;
-
-const presetExists = require('../helpers').presetExists;
-const adaptError = require('../helpers').adaptError;
+const Boom = require('@hapi/boom');
 
 module.exports = {
     get: {
         method: 'GET',
         path: '/config/{id}/presets/JOSM',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
                 const id = r.params.id;
 
                 return presetExists(id)
-                    .then(function (results) {
+                    .then(function(results) {
                         let config = mergePrimaries(JSON.parse(results[0].preset));
                         let josmPresets = adaptJosmPresets(config);
 
@@ -28,7 +26,12 @@ module.exports = {
                     })
                     .catch(adaptError);
             },
-            validate: { params: { id: uuidSchema } }
+            validate: {
+                params: { id: validateIdPathParam },
+                failAction: function(request, h, error) {
+                    return Boom.badRequest(error.message);
+                }
+            }
         }
     }
 };

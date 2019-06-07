@@ -17,7 +17,7 @@ server.auth.scheme('jwt', jwtScheme);
 server.auth.strategy('default', 'jwt');
 
 // initialize server
-const initServer = async () => {
+const initServer = async() => {
     await server.register(inert);
     await server.register(yar);
 

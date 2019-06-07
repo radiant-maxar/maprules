@@ -1,6 +1,5 @@
 'use strict';
 
-const Joi = require('@hapi/joi');
 const chai = require('chai');
 const expect = chai.expect;
 const server = require('../server');
@@ -11,32 +10,61 @@ const mergeDefaults = require('../helpers').mergeDefaults;
 const get = require('../../routes/iDPresets').get;
 
 module.exports = () => {
-    before(async () => await server.liftOff(get));
+    before((done) => {
+        server.liftOff(get)
+            .then(function() {
+                done();
+            })
+            .catch(function(error) {
+                console.log(error.message);
+            });
+    });
     describe('get', () => {
-        it('returns 200 and an idPresets json if id in db', async () => {
+        it('returns 200 and an idPresets json if id in db', function(done) {
             const request = mergeDefaults({
-                    method: 'GET',
-                    url: `/config/${id}/presets/iD`
-                }),
-                r = await server.inject(request),
-                iDPresets = r.result,
-                statusCode = r.statusCode;
+                method: 'GET',
+                url: `/config/${id}/presets/iD`
+            });
 
-            expect(statusCode).to.equal(200);
-            expect(iDPresets).not.to.be.null;
+            server.inject(request).then(function(r) {
+                const iDPresets = r.result;
+                const statusCode = r.statusCode;
+
+                expect(statusCode).to.equal(200);
+                expect(iDPresets).not.to.be.null;
+                done();
+            });
 
         });
-        it('returns 404 if id not in database', async () => {
+        it('returns 404 if id not in database', function(done) {
             const request = mergeDefaults({
-                    method: 'GET',
-                    url: `/config/${uuidv4()}/presets/iD`
-                }),
-                r = await server.inject(request),
-                statusCode = r.statusCode;
+                method: 'GET',
+                url: `/config/${uuidv4()}/presets/iD`
+            });
 
+            server.inject(request).then(function(r) {
+                const { statusCode, message, error } = r.result;
 
-            expect(statusCode).to.equal(404);
+                expect(error).to.eql('Not Found');
+                expect(message).to.eql('Cannot find config for provided id and user');
+                expect(statusCode).to.equal(404);
+                done();
+            });
+        });
+        it('returns 400 if id not valid', function(done) {
+            const request = mergeDefaults({
+                method: 'GET',
+                url: `/config/${uuidv4() + uuidv4()}/presets/iD`
+            });
 
+            server.inject(request).then(function(r) {
+                const { statusCode, error, message } = r.result;
+
+                expect(statusCode).to.eql(400);
+                expect(error).to.eql('Bad Request');
+                expect(message).to.eql('id path parameter is invalid');
+                done();
+            });
         });
     });
 };

@@ -11,7 +11,6 @@ const uuidSchema = require('../../schemas/components').uuid;
 const mergeDefaults = require('../helpers').mergeDefaults;
 const seedData = require('../../testData/seeds');
 const seedId = seedData.presets[0].id;
-const signedToken = seedData.fakeToken;
 
 const { get, post, put } = require('../../routes/presetConfig');
 
@@ -20,21 +19,21 @@ const invalidPresetConfig = require('../../testData/presetConfig/osm/invalid.jso
 
 
 module.exports = () => {
-    before(async () => await server.liftOff(get));
+    before(async() => await server.liftOff(get));
     describe('get', () => {
         it('replies 200 and presetConfig provided uuid that exists in the db', (done) => {
             const request = mergeDefaults({
                 method: 'GET',
                 url: `/config/${seedId}`
             });
-            server.inject(request).then(function (r) {
+            server.inject(request).then(function(r) {
                 const statusCode = r.statusCode;
                 const presetConfig = r.result;
                 const validation = Joi.validate(presetConfig, presetConfigSchema);
                 expect(statusCode).to.equal(200);
                 expect(validation.error).to.be.null;
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
@@ -44,10 +43,14 @@ module.exports = () => {
                 url: `/config/${uuidv1()}`
             });
 
-            server.inject(request).then(function (r) {
-                expect(r.statusCode).to.equal(400);
+            server.inject(request).then(function(r) {
+                const { statusCode, message, error } = r.result;
+
+                expect(statusCode).to.equal(400);
+                expect(message).to.eql('id path parameter is invalid');
+                expect(error).to.eql('Bad Request');
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
@@ -56,15 +59,15 @@ module.exports = () => {
                 method: 'GET',
                 url: `/config/${uuidv4()}`
             });
-            server.inject(request).then(function (r) {
+            server.inject(request).then(function(r) {
                 expect(r.statusCode).to.equal(404);
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
     });
-    before(async () => await server.liftOff(put));
+    before(async() => await server.liftOff(put));
     describe('put', () => {
         it('replies 200 when the uuid exists in db and presetConfig is valid', (done) => {
             let test = Object.assign({}, validPresetConfig); test.name = 'bew';
@@ -74,10 +77,10 @@ module.exports = () => {
                 url: `/config/${seedId}`
             }, true);
 
-            server.inject(request).then(function (r) {
+            server.inject(request).then(function(r) {
                 expect(r.statusCode).to.equal(200);
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
@@ -88,14 +91,14 @@ module.exports = () => {
                 url: `/config/${seedId}`
             }, true);
 
-            server.inject(request).then(function (r) {
-                const statusCode = r.statusCode;
-                const message = r.result.message;
+            server.inject(request).then(function(r) {
+                const { statusCode, message, error } = r.result;
 
                 expect(statusCode).to.be.equal(400);
-                expect(message).to.not.be.null;
+                expect(message).to.eql('child "name" fails because ["name" is required]');
+                expect(error).to.eql('Bad Request');
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
@@ -106,14 +109,14 @@ module.exports = () => {
                 url: `/config/${uuidv1()}`
             }, true);
 
-            server.inject(request).then(function (r) {
-                const statusCode = r.statusCode;
-                const message = r.result.message;
+            server.inject(request).then(function(r) {
+                const { statusCode, message, error } = r.result;
 
-                expect(statusCode).to.be.equal(400);
-                expect(message).to.not.be.null;
+                expect(statusCode).to.equal(400);
+                expect(message).to.eql('id path parameter is invalid');
+                expect(error).to.eql('Bad Request');
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
@@ -124,16 +127,18 @@ module.exports = () => {
                 url: `/config/${uuidv4()}`
             }, true);
 
-            server.inject(request).then(function (r) {
-                const statusCode = r.statusCode;
-                expect(statusCode).to.be.equal(404);
+            server.inject(request).then(function(r) {
+                let { statusCode, error, message } = r.result;
+                expect(statusCode).to.eql(404);
+                expect(error).to.eql('Not Found');
+                expect(message).to.eql('Cannot find config for provided id and user');
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
     });
-    before(async () => await server.liftOff(post));
+    before(async() => await server.liftOff(post));
     describe('post', () => {
         it('replies 200 if provided presetConfig is valid', (done) => {
             const request = mergeDefaults({
@@ -142,7 +147,7 @@ module.exports = () => {
                 url: '/config'
             }, true);
 
-            server.inject(request).then(function (r) {
+            server.inject(request).then(function(r) {
                 const isAuthenticated = r.request.auth.isAuthenticated;
                 const statusCode = r.statusCode;
                 const { upload, id } = r.result;
@@ -160,7 +165,7 @@ module.exports = () => {
                 expect(error).to.be.null;
                 expect(value).to.eql(id);
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });
@@ -171,25 +176,15 @@ module.exports = () => {
                 url: '/config'
             }, true);
 
-            server.inject(request).then(function (r) {
-                expect(r.statusCode).to.equal(400);
-                done();
-            }).catch(function (err) {
-                throw err;
-            });
-        });
-        it('replies message indicating first schema offense if presetConfig is invalid', (done) => {
-            const request = mergeDefaults({
-                method: 'POST',
-                payload: invalidPresetConfig,
-                url: '/config'
-            }, true);
+            server.inject(request).then(function(r) {
+                const { statusCode, message, error } = r.result;
 
-            server.inject(request).then(function (r) {
-                const message = r.result.message;
-                expect(message).to.not.be.null;
+
+                expect(statusCode).to.equal(400);
+                expect(message).to.eql('child "name" fails because ["name" is required]');
+                expect(error).to.eql('Bad Request');
                 done();
-            }).catch(function (err) {
+            }).catch(function(err) {
                 throw err;
             });
         });

@@ -3,7 +3,7 @@
 const seedData = require('../testData/seeds');
 
 // adds user, user session, and presets needed to
-exports.seed = async (knex) => {
+exports.seed = async(knex) => {
     try {
         await knex('users').del();
         await knex('users').insert(seedData.user);
@@ -17,7 +17,7 @@ exports.seed = async (knex) => {
         });
 
         await knex('presets').del();
-        return Promise.all(seedData.presets.map(function (preset) {
+        return Promise.all(seedData.presets.map(function(preset) {
             return knex('presets').insert({
                 id: preset.id,
                 preset: JSON.stringify(preset.config),

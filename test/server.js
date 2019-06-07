@@ -10,7 +10,7 @@ const server = Hapi.server({ port: 3001, host: host });
 server.auth.scheme('jwt', jwtScheme);
 server.auth.strategy('default', 'jwt');
 
-server.liftOff = async (route) => {
+server.liftOff = async(route) => {
     try {
         server.route(route);
         if (!module.parent) {
@@ -28,7 +28,7 @@ server.liftOff = async (route) => {
     }
 };
 
-server.crashLanding = async () => {
+server.crashLanding = async() => {
     try {
         return await server.stop();
 
@@ -38,7 +38,7 @@ server.crashLanding = async () => {
     }
 };
 
-void async function () {
+void async function() {
     try {
         await server.register(yar);
         if (!module.parent) {

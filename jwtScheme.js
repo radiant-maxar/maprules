@@ -31,7 +31,7 @@ function outOfDate(timestamp) {
 function isAuthorized(token, userAgent) {
     return db('user_sessions')
         .where({ id: token.session, user_id: token.id })
-        .then(function (sessions) {
+        .then(function(sessions) {
             if (!sessions.length) {
                 throw new Error('token invalid, session unknown');
             }
@@ -44,7 +44,7 @@ function isAuthorized(token, userAgent) {
                 return db('user_sessions')
                     .where('id', 'token.session')
                     .delete()
-                    .then(function () {
+                    .then(function() {
                         throw new Error('token invalid, session expired');
                     });
             }
@@ -57,21 +57,21 @@ function isAuthorized(token, userAgent) {
             // considered authorized...
             return db('users')
                 .where('id', token.id)
-                .then(function (user) {
+                .then(function(user) {
                     if (!user.length) {
                         throw new Error('token invalid, ses');
                     }
                     return token;
                 });
 
-        }).catch(function (e) {
+        }).catch(function(e) {
             throw new Error(e.message);
         });
 }
 
 function jwtAuthentication(request, h) {
     return Promise.resolve(request.headers.authorization)
-        .then(function (authHeader) {
+        .then(function(authHeader) {
             if (!authHeader || !authHeader.length) {
                 throw new Error('no token provided');
             }
@@ -93,10 +93,10 @@ function jwtAuthentication(request, h) {
 
             return isAuthorized(token, request.headers['user-agent']);
         })
-        .then(function (token) {
+        .then(function(token) {
             return h.authenticated({ credentials: token });
         })
-        .catch(function (error) {
+        .catch(function(error) {
             return Boom.unauthorized(error.message, 'Bearer');
         });
 }

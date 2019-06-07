@@ -9,7 +9,8 @@
         "indent": ["warn", 4],
         "quotes": [2, "single"],
         "semi": [1, "always"],
-        "comma-dangle": ["error", "never"]
+        "comma-dangle": ["error", "never"],
+        "space-before-function-paren": ["error", "never"]
     },
     "parserOptions": {
         "ecmaVersion": 6
