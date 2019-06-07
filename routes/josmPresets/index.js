@@ -10,6 +10,7 @@ const adaptError = require('../helpers').adaptError;
 
 module.exports = {
     get: {
+        method: 'GET',
         path: '/config/{id}/presets/JOSM',
         config: {
             handler: function (r, h) {
