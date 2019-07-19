@@ -91,7 +91,7 @@ NODE_ENV=development yarn fixture
 #### Spin up the server
 
 ```
-yarn dev
+PORT=3001 yarn dev
 ```
 
 #### Test
