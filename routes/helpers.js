@@ -2,18 +2,19 @@
 
 const db = require('../connection');
 const Boom = require('@hapi/boom');
+const uuidSchema = require('../schemas/components').uuid;
 
 const _notFound = 'Cannot find config for provided id and user';
 
 exports.notFound = _notFound;
-exports.presetExists = function (id, userId) {
+exports.presetExists = function(id, userId) {
     let where = { id: id };
 
     if (userId) where.user_id = userId;
 
     return db('presets')
         .where(where)
-        .then(function (results) {
+        .then(function(results) {
             if (!results.length) {
                 throw new Error(_notFound);
             };
@@ -21,10 +22,12 @@ exports.presetExists = function (id, userId) {
         });
 };
 
-exports.adaptError = function (error) {
+exports.adaptError = function(error) {
     if (error.message === _notFound) {
         return Boom.notFound(error.message);
     } else {
         return Boom.badImplementation(error.message);
     }
 };
+
+exports.validateIdPathParam = uuidSchema.error(new Error('id path parameter is invalid'));

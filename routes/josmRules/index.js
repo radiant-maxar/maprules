@@ -2,21 +2,19 @@
 
 const adaptRules = require('../../adapters/rules');
 const Boom = require('@hapi/boom');
-const uuidSchema = require('../../schemas/components').uuid;
-const presetExists = require('../helpers').presetExists;
-const adaptError = require('../helpers').adaptError;
+const { adaptError, presetExists, validateIdPathParam } = require('../helpers');
 
 module.exports = {
     get: {
         method: 'GET',
         path: '/config/{id}/rules/JOSM',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
                 try {
                     const id = r.params.id;
 
                     return presetExists(id)
-                        .then(function (results) {
+                        .then(function(results) {
                             let config = JSON.parse(results[0].preset);
                             let rules = adaptRules(config);
 
@@ -32,7 +30,12 @@ module.exports = {
 
                 }
             },
-            validate: { params: { id: uuidSchema } }
+            validate: {
+                params: { id: validateIdPathParam },
+                failAction: function(request, h, error) {
+                    return Boom.badRequest(error.message);
+                }
+            }
         }
     }
 };

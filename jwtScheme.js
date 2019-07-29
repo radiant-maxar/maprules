@@ -11,7 +11,7 @@ const dayjs = require('dayjs');
  * @param {Date} timestamp timestamp when session token was created
  */
 function outOfDate(timestamp) {
-    return dayjs(timestamp).diff(Date.now(), 'hours') > 8;
+    return dayjs(Date.now()).diff(timestamp, 'hours') > 8;
 }
 
 /**
@@ -28,56 +28,77 @@ function outOfDate(timestamp) {
  * @param {object} headers object holding http request headers
  * @return {boolean} true when correct header is present, represents currently valid JWT, and user that exists in DB
  */
-function isAuthorized(token) {
+function isAuthorized(token, userAgent) {
     return db('user_sessions')
-        .where('id', token.session)
-        .then(function (session) {
-            if (!session.length) {
-                return false;
+        .where({ id: token.session, user_id: token.id })
+        .then(function(sessions) {
+            if (!sessions.length) {
+                throw new Error('token invalid, session unknown');
             }
+
+            let session = sessions[0];
 
             // consider out of date token 'unauthorized'
             // also, make sure to delete it...
-            if (outOfDate(session[0].created_at)) {
+            if (outOfDate(session.created_at)) {
                 return db('user_sessions')
                     .where('id', 'token.session')
                     .delete()
-                    .then(function () {
-                        return false;
+                    .then(function() {
+                        throw new Error('token invalid, session expired');
                     });
+            }
+
+            if (session.user_agent !== userAgent) {
+                throw new Error('token invalid');
             }
 
             // also, token for user that does not exist isn't
             // considered authorized...
             return db('users')
                 .where('id', token.id)
-                .then(function (user) {
-                    return user.length > 0;
+                .then(function(user) {
+                    if (!user.length) {
+                        throw new Error('token invalid, ses');
+                    }
+                    return token;
                 });
 
-        }).catch(function (e) {
-            console.log(e);
-            return false;
+        }).catch(function(e) {
+            throw new Error(e.message);
         });
 }
 
-async function jwtAuthentication(request, h) {
-    try {
-        let authorizationHeader = request.headers.authorization;
-        if (!authorizationHeader || !authorizationHeader.length) {
-            throw Boom.unauthorized(null, 'Custom');
-        }
+function jwtAuthentication(request, h) {
+    return Promise.resolve(request.headers.authorization)
+        .then(function(authHeader) {
+            if (!authHeader || !authHeader.length) {
+                throw new Error('no token provided');
+            }
 
-        let token = jwt.verify(authorizationHeader.replace('Bearer ', ''), config.jwt);
-        let authorized = await isAuthorized(token);
-        if (!authorized) {
-            throw Boom.unauthorized(null, 'Custom');
-        }
+            if (!authHeader.startsWith('Bearer ')) {
+                throw new Error('authentication strategy is invalid');
+            }
 
-        return h.authenticated({ credentials: token });
-    } catch (error) {
-        throw Boom.unauthorized(null, 'Custom');
-    }
+            if (!authHeader.replace('Bearer ', '').length) {
+                throw new Error('no token provided');
+            }
+
+            let token;
+            try {
+                token = jwt.verify(authHeader.replace('Bearer ', ''), config.jwt);
+            } catch (error) {
+                throw new Error('invalid token provided');
+            }
+
+            return isAuthorized(token, request.headers['user-agent']);
+        })
+        .then(function(token) {
+            return h.authenticated({ credentials: token });
+        })
+        .catch(function(error) {
+            return Boom.unauthorized(error.message, 'Bearer');
+        });
 }
 
 /**

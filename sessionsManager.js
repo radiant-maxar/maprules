@@ -10,20 +10,20 @@ let sessions = [];
  *
  */
 module.exports = {
-    add: function (session) {
+    add: function(session) {
         sessions.push(session);
     },
-    get: function (idx) {
+    get: function(idx) {
         return sessions[idx];
     },
-    all: function () {
+    all: function() {
         return sessions;
     },
     remove: function(session) {
         const idx = sessions.indexOf(session);
         if (idx !== -1) sessions.splice(idx, 1);
     },
-    clear: function () {
+    clear: function() {
         sessions = [];
     }
 };

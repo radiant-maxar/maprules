@@ -2,23 +2,22 @@
 
 const adaptRules = require('../../adapters/rules');
 const parseMapCSS = require('mapcss-parse').parse;
-const uuidSchema = require('../../schemas/components').uuid;
-const presetExists = require('../helpers').presetExists;
-const adaptError = require('../helpers').adaptError;
 
 const Boom = require('@hapi/boom');
+
+const { presetExists, adaptError, validateIdPathParam } = require('../helpers');
 
 module.exports = {
     get: {
         method: 'GET',
         path: '/config/{id}/rules/iD',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
                 try {
                     const id = r.params.id;
 
                     return presetExists(id)
-                        .then(function (results) {
+                        .then(function(results) {
                             const config = JSON.parse(results[0].preset);
                             const adaptedRules = adaptRules(config);
                             const rulesMapCSS = adaptedRules.length ? parseMapCSS(adaptedRules) : [];
@@ -33,7 +32,12 @@ module.exports = {
                     return Boom.badImplementation(error.message);
                 }
             },
-            validate: { params: { id: uuidSchema } }
+            validate: {
+                params: { id: validateIdPathParam },
+                failAction: function(request, h, error) {
+                    return Boom.badRequest(error.message);
+                }
+            }
         }
     }
 };

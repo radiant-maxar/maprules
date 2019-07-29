@@ -9,7 +9,7 @@ module.exports = {
         method: 'POST',
         path: '/mapcss',
         config: {
-            handler: async (r, h) => {
+            handler: async(r, h) => {
                 try {
                     const mapcss = r.payload;
                     const rulesMapCSS = parseMapCSS(mapcss);
@@ -24,12 +24,12 @@ module.exports = {
 
                     return h.response(rulesMapCSS).header('Content-Type', 'application/json').code(200);
                 } catch (error) {
-                    return Boom.boomify(error, { statusCode: 400 });
+                    return Boom.badRequest('provided mapcss is invalid');
                 }
             },
             cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] },
             validate: {
-                failAction: async (request, h, err) => err
+                failAction: async(request, h, err) => err
             }
         }
     })

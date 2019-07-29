@@ -1,39 +1,37 @@
 'use strict';
 
-const Boom = require('@hapi/boom');
-const uuidSchema = require('../../schemas/components').uuid;
 const adaptJosmPresets = require('../../adapters').josmPresets;
 const mergePrimaries = require('../../adapters/serialize').mergePrimaries;
+const { adaptError, presetExists, validateIdPathParam } = require('../helpers');
 
-const adaptError = require('../helpers').adaptError;
-const presetExists = require('../helpers').presetExists;
+const Boom = require('@hapi/boom');
 
 module.exports = {
     get: {
         method: 'GET',
         path: '/config/{id}/presets/JOSM',
         config: {
-            handler: (r, h) => {
-                try {
-                    const id = r.params.id;
+            handler: function(r, h) {
+                const id = r.params.id;
 
-                    return presetExists(id)
-                        .then(function (results) {
-                            const config = mergePrimaries(JSON.parse(results[0].preset));
-                            const josmPresets = adaptJosmPresets(config);
+                return presetExists(id)
+                    .then(function(results) {
+                        let config = mergePrimaries(JSON.parse(results[0].preset));
+                        let josmPresets = adaptJosmPresets(config);
 
-                            return h
-                                .response(josmPresets)
-                                .code(200)
-                                .header('Content-Type', 'text/xml');
-                        })
-                        .catch(adaptError);
-
-                } catch (error) {
-                    return Boom.badImplementation(error.message);
-                }
+                        return h
+                            .response(josmPresets)
+                            .code(200)
+                            .header('Content-Type', 'text/xml');
+                    })
+                    .catch(adaptError);
             },
-            validate: { params: { id: uuidSchema } }
+            validate: {
+                params: { id: validateIdPathParam },
+                failAction: function(request, h, error) {
+                    return Boom.badRequest(error.message);
+                }
+            }
         }
     }
 };

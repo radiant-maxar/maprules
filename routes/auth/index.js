@@ -28,7 +28,7 @@ module.exports = {
                      *
                      * ... if the token/verifier query parameters are not preset or it cannot find the partner oauth_token_secret, it returns an error.
                      */
-                    method: function (r, h) { // gets called before handler...
+                    method: function(r, h) { // gets called before handler...
                         let oauthToken = r.query.oauth_token;
 
                         if (!oauthToken || !oauthToken.length) {
@@ -77,7 +77,7 @@ module.exports = {
                     }
                 }
             ],
-            handler: function (r, h) {
+            handler: function(r, h) {
                 let { oauthToken, oauthVerifier, oauthTokenSecret, sessionId, userAgent } = r.pre.callbackValidation;
 
                 const accessTokenConfig = {
@@ -94,7 +94,7 @@ module.exports = {
 
                 // make request to request_token
                 return requestPromise(accessTokenConfig)
-                    .then(function (body) {
+                    .then(function(body) {
                         // try to parse the response
                         let tokenResponse;
                         try {
@@ -120,9 +120,9 @@ module.exports = {
                         };
 
                         return requestPromise(userDetailsConfig)
-                            .then(function (body) {
-                                return new Promise(function (resolve, reject) {
-                                    parseXML(body, function (error, result) {
+                            .then(function(body) {
+                                return new Promise(function(resolve, reject) {
+                                    parseXML(body, function(error, result) {
                                         if (error) {
                                             reject();
                                         } else {
@@ -131,7 +131,7 @@ module.exports = {
                                     });
                                 });
                             })
-                            .then(async function (userDetails) {
+                            .then(async function(userDetails) {
                                 let details = {
                                     id: userDetails.osm.user[0]['$'].id,
                                     name: userDetails.osm.user[0]['$'].display_name
@@ -186,14 +186,14 @@ module.exports = {
                                 }
                             });
                     })
-                    .then(function (decodedJWT) {
+                    .then(function(decodedJWT) {
                         sessionsManager.remove(sessionId);
                         r.yar.clear(sessionId);
 
                         const signedToken = jwt.sign(decodedJWT, config.jwt);
                         return h.response(signedToken).code(200);
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         sessionsManager.remove(sessionId);
                         r.yar.clear(sessionId);
 
@@ -206,7 +206,7 @@ module.exports = {
         method: 'GET',
         path: '/auth/login',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
                 if (!config.jwt.length) throw error;
 
                 const requestTokenConfig = {
@@ -220,7 +220,7 @@ module.exports = {
                 };
 
                 return requestPromise(requestTokenConfig)
-                    .then(function (body) {
+                    .then(function(body) {
                         let tokenResponse;
                         try {
                             tokenResponse = qs.parse(body);
@@ -247,7 +247,7 @@ module.exports = {
                             .header('X-Content-Type-Options', 'nosniff');
 
                     })
-                    .catch(function (error) {
+                    .catch(function(error) {
                         console.log(error);
                         throw error;
                     });
@@ -258,7 +258,7 @@ module.exports = {
         method: 'POST',
         path: '/auth/logout',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
                 let token = r.auth.credentials;
                 let userAgent = r.headers['user-agent'];
                 let sessionWhere = {
@@ -270,14 +270,14 @@ module.exports = {
                 return db('user_sessions')
                     .where(sessionWhere)
                     .delete()
-                    .then(function (r) {
+                    .then(function(r) {
                         return h
                             .response('logged out')
                             .code(200)
                             .header('Content-Type', 'text')
                             .header('X-Content-Type-Options', 'nosniff');
                     })
-                    .catch(function (e) {
+                    .catch(function(e) {
                         throw e;
                     });
             }
@@ -290,7 +290,7 @@ module.exports = {
     session: authenticate({
         method: 'GET',
         path: '/auth/session',
-        handler: function (r, h) {
+        handler: function(r, h) {
             return h
                 .response('authenticated')
                 .code(200)
