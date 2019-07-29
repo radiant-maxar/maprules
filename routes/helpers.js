@@ -31,3 +31,4 @@ exports.adaptError = function(error) {
 };
 
 exports.validateIdPathParam = uuidSchema.error(new Error('id path parameter is invalid'));
+

@@ -42,8 +42,3 @@ module.exports = {
  *   jwt - private key used to sign and decode JSON Web Tokens ** REQUIRED **
  * }
 */
-
-
-// Request Token URL: http://localhost:3000/oauth/request_token
-// Access Token URL: http://localhost:3000/oauth/access_token
-// Authorise URL: http://localhost:3000/oauth/authorize

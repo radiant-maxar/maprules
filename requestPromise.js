@@ -17,3 +17,4 @@ let requestPromise = function(options) {
 };
 
 module.exports = requestPromise;
+

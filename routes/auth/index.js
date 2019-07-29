@@ -146,9 +146,10 @@ module.exports = {
                                         exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8)
                                     };
 
-                                    if (!user.length) { // if new user, insert into db and make new session jwt
+                                    decodedJWT.session = uuid();
+                                    
+									if (!user.length) { // if new user, insert into db and make new session jwt
                                         await db('users').insert(details);
-                                        decodedJWT.session = uuid();
                                         await db('user_sessions').insert({
                                             id: decodedJWT.session,
                                             user_id: details.id,
@@ -156,7 +157,6 @@ module.exports = {
                                             created_at: new Date()
                                         });
                                     } else { // logged in user.
-                                        decodedJWT.session = uuid();
                                         let whereAgentUser = {
                                             user_id: details.id,
                                             user_agent: userAgent
