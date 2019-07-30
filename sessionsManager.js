@@ -1,6 +1,6 @@
 'use strict';
 
-let sessions = [];
+let sessions = {};
 
 /**
  * Manages list of current OSM oAuth sessions.
@@ -10,20 +10,19 @@ let sessions = [];
  *
  */
 module.exports = {
-    add: function(session) {
-        sessions.push(session);
+    add: function(session, value) {
+        sessions[session] = value;
     },
     get: function(idx) {
         return sessions[idx];
     },
-    all: function() {
-        return sessions;
+    sessions: function() {
+        return Object.keys(sessions);
     },
     remove: function(session) {
-        const idx = sessions.indexOf(session);
-        if (idx !== -1) sessions.splice(idx, 1);
+        delete sessions[session];
     },
     clear: function() {
-        sessions = [];
+        sessions = {};
     }
 };
