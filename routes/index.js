@@ -1,11 +1,13 @@
 'use strict';
 
-const { login, logout, callback } = require('./auth');
+const { login, logout, callback, session, verify } = require('./auth');
 
 module.exports = [
     login,
     logout,
     callback,
+    session,
+    verify,
     require('./iDPresets').get,
     require('./iDRules').get,
     require('./josmPresets').get,

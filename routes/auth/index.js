@@ -11,8 +11,44 @@ const parseXML = require('xml2js').parseString;
 const uuid = require('uuid/v4');
 const jwt = require('jsonwebtoken');
 const callbackUrl = config.callbackUrl;
+// const maprules = config.maprules;
 
 module.exports = {
+    verify: authenticate({
+        method: 'GET',
+        path: '/auth/verify',
+        config: {
+            handler: function(r, h) {
+
+                const { oauth_token, oauth_verifier } = r.query;
+
+                if (!oauth_token || !oauth_verifier) {
+                    throw Error('missing required query parameters');
+                }
+
+                let match = false;
+                for (let id of  sessionsManager.sessions()) {
+                    let session = sessionsManager.get(id);
+                    if (
+                        session.oauth_token === oauth_token &&
+                        session.oauth_verifier === oauth_verifier
+                    ) {
+                        match = true;
+                        sessionsManager.remove(id);
+                        break;
+                    }
+                }
+
+                if (!match) throw Error('query parameter values are invalid');
+
+                const user = jwt.verify(r.state.maprules_session, config.jwt);
+                return h
+                    .response({ name: user.name, id: user.id })
+                    .header('Content-Type', 'application/json')
+                    .code(200);
+            }
+        }
+    }),
     callback: {
         method: 'GET',
         path: '/auth/callback',
@@ -41,15 +77,14 @@ module.exports = {
                             throw err;
                         }
 
-                        let oauthTokenSecret, userAgent, sessionId;
+                        let origin, oauthTokenSecret, userAgent, sessionId;
 
-                        for (let i = 0; i < sessionsManager.all().length; i++) {
-                            sessionId = sessionsManager.get(i);
-                            let session = r.yar.get(sessionId);
+                        for (id of sessionsManager.sessions()) {
+                            let session = sessionsManager.get(id);
+
 
                             if (!session) {
-                                sessionsManager.remove(sessionId);
-                                throw new Error('unknown session!!!');
+                                continue;
                             }
 
 
@@ -59,6 +94,8 @@ module.exports = {
 
                             oauthTokenSecret = session.oauth_token_secret;
                             userAgent = session.user_agent;
+                            origin = session.origin;
+                            sessionId = id;
                             break;
                         }
 
@@ -71,14 +108,24 @@ module.exports = {
                             oauthVerifier: oauthVerifier,
                             oauthTokenSecret: oauthTokenSecret,
                             sessionId: sessionId,
-                            userAgent: userAgent
+                            userAgent: userAgent,
+                            origin: origin
                         };
 
                     }
                 }
             ],
             handler: function(r, h) {
-                let { oauthToken, oauthVerifier, oauthTokenSecret, sessionId, userAgent } = r.pre.callbackValidation;
+                let {
+                    oauthToken,
+                    oauthVerifier,
+                    oauthTokenSecret,
+                    sessionId,
+                    userAgent,
+                    origin
+                } = r.pre.callbackValidation;
+
+                sessionsManager.update(sessionId, { oauth_verifier: oauthVerifier });
 
                 const accessTokenConfig = {
                     url: `${osm}/oauth/access_token`,
@@ -147,8 +194,8 @@ module.exports = {
                                     };
 
                                     decodedJWT.session = uuid();
-                                    
-									if (!user.length) { // if new user, insert into db and make new session jwt
+
+                                    if (!user.length) { // if new user, insert into db and make new session jwt
                                         await db('users').insert(details);
                                         await db('user_sessions').insert({
                                             id: decodedJWT.session,
@@ -180,23 +227,22 @@ module.exports = {
                                         }
                                     }
 
-                                    return decodedJWT;
+                                    return {
+                                        jwt: decodedJWT,
+                                        origin: origin
+                                    };
                                 } catch (error) {
                                     throw error;
                                 }
                             });
                     })
-                    .then(function(decodedJWT) {
-                        sessionsManager.remove(sessionId);
-                        r.yar.clear(sessionId);
-
-                        const signedToken = jwt.sign(decodedJWT, config.jwt);
-                        return h.response(signedToken).code(200);
+                    .then(function(resp) {
+                        return h
+                            .redirect(`${resp.origin}/login.html?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`)
+                            .state('maprules_session', jwt.sign(resp.jwt, config.jwt));
                     })
                     .catch(function(err) {
                         sessionsManager.remove(sessionId);
-                        r.yar.clear(sessionId);
-
                         throw err;
                     });
             }
@@ -230,14 +276,11 @@ module.exports = {
 
                         // create record ofo new session in sessions list so we can track response when
                         // logged in user comes back to callback_url
-                        const sessionId = uuid();
-                        sessionsManager.add(sessionId);
-
-                        // save the session in our session manager...
-                        r.yar.set(sessionId, {
+                        sessionsManager.add(uuid(), {
                             oauth_token: tokenResponse.oauth_token,
                             oauth_token_secret: tokenResponse.oauth_token_secret,
-                            user_agent: r.headers['user-agent']
+                            user_agent: r.headers['user-agent'],
+                            origin: r.headers.origin
                         });
 
                         return h

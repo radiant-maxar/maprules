@@ -16,6 +16,12 @@ module.exports = {
     get: function(idx) {
         return sessions[idx];
     },
+    update: function (session, value) {
+        let sessionConfig = sessions[session];
+        if (sessionConfig) {
+            sessionConfig = Object.assign(sessionConfig, value);
+        }
+    },
     sessions: function() {
         return Object.keys(sessions);
     },

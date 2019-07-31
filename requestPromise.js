@@ -10,8 +10,9 @@ let requestPromise = function(options) {
         request(options, function(err, rs, body) {
             if (err) {
                 reject(err);
+            } else {
+                resolve(body);
             }
-            resolve(body);
         });
     });
 };

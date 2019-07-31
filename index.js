@@ -9,10 +9,7 @@ const jwtScheme = require('./jwtScheme').scheme;
 const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: process.env.HOST || 'localhost',
-    debug: { request: ['*']},
-    routes: {
-        cors: true
-    }
+    routes: { cors: true }
 });
 
 server.auth.scheme('jwt', jwtScheme);
@@ -20,7 +17,7 @@ server.auth.strategy('default', 'jwt');
 
 // initialize server
 const initServer = async() => {
-    // server.state('session', config.session);
+    server.state('maprules_session', config.session);
     await server.register(inert);
 
     // add endpoints
