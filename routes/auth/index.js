@@ -18,7 +18,7 @@ module.exports = {
         method: 'GET',
         path: '/auth/verify',
         config: {
-            handler: function(r, h) {
+            handler: function (r, h) {
 
                 const { oauth_token, oauth_verifier } = r.query;
 
@@ -27,7 +27,7 @@ module.exports = {
                 }
 
                 let match = false;
-                for (let id of  sessionsManager.sessions()) {
+                for (let id of sessionsManager.sessions()) {
                     let session = sessionsManager.get(id);
                     if (
                         session.oauth_token === oauth_token &&
@@ -46,6 +46,11 @@ module.exports = {
                     .response({ name: user.name, id: user.id })
                     .header('Content-Type', 'application/json')
                     .code(200);
+            },
+            cors: {
+                origin: ['*'],
+                headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match', 'Access-Control-Allow-Origin'],
+                credentials: true
             }
         }
     }),
