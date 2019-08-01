@@ -13,6 +13,13 @@ const jwt = require('jsonwebtoken');
 const callbackUrl = config.callbackUrl;
 // const maprules = config.maprules;
 
+// https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
+const contentTypeCORS = {
+    origin: ['*'],
+    headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match', 'Access-Control-Allow-Origin'],
+    credentials: true
+}
+
 module.exports = {
     verify: authenticate({
         method: 'GET',
@@ -47,11 +54,7 @@ module.exports = {
                     .header('Content-Type', 'application/json')
                     .code(200);
             },
-            cors: {
-                origin: ['*'],
-                headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match', 'Access-Control-Allow-Origin'],
-                credentials: true
-            }
+            cors: contentTypeCORS
         }
     }),
     callback: {
@@ -338,12 +341,29 @@ module.exports = {
     session: authenticate({
         method: 'GET',
         path: '/auth/session',
-        handler: function(r, h) {
-            return h
-                .response('authenticated')
-                .code(200)
-                .header('Content-Type', 'text')
-                .header('X-Content-Type-Options', 'nosniff');
+        config: {
+            handler: function(r, h) {
+                return h
+                    .response('authenticated')
+                    .code(200)
+                    .header('Content-Type', 'text')
+                    .header('X-Content-Type-Options', 'nosniff');
+            },
+            cors: contentTypeCORS
+        }
+    }),
+    user: authenticate({
+        method: 'GET',
+        path: '/auth/user',
+        config: {
+            handler: function (r, h) {
+                const user = jwt.verify(r.state.maprules_session, config.jwt);
+                return h
+                    .response({ name: user.name, id: user.id })
+                    .header('Content-Type', 'application/json')
+                    .code(200);
+            },
+            cors: contentTypeCORS
         }
     })
 };
