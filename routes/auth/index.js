@@ -331,8 +331,9 @@ module.exports = {
                     .catch(function(e) {
                         throw e;
                     });
-            }
-        }
+            },
+            cors: contentTypeCORS
+        },
     }),
     /**
      * the jwt strategy will capture fail cases and return 401.
