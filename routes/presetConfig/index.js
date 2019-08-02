@@ -25,20 +25,16 @@ module.exports = {
         config: {
             auth: false,
             handler: function(r, h) {
-                try {
-                    const { id } = r.params;
+                const { id } = r.params;
 
-                    return presetExists(id)
-                        .then(function(results) {
-                            const config = JSON.parse(results[0].preset);
-                            return h.response(config).code(200);
-                        })
-                        .catch(function(error) {
-                            return Boom.notFound(error.message);
-                        });
-                } catch (error) {
-                    return Boom.badImplementation(error);
-                }
+                return presetExists(id)
+                    .then(function(results) {
+                        const config = JSON.parse(results[0].preset);
+                        return h.response(config).code(200);
+                    })
+                    .catch(function(error) {
+                        return Boom.notFound(error.message);
+                    });
             },
             validate: {
                 params: { id: validateIdPathParam },
@@ -54,26 +50,22 @@ module.exports = {
         path: '/config/{id}',
         config: {
             handler: function(r, h) {
-                try {
-                    const token = r.auth.credentials;
-                    const id = r.params.id;
-                    const preset = JSON.stringify(r.payload);
+                const token = r.auth.credentials;
+                const id = r.params.id;
+                const preset = JSON.stringify(r.payload);
 
-                    return presetExists(id, token.id)
-                        .then(function() { // check first that to update exists, then update, otherwise throw 404 to user.
-                            return db('presets')
-                                .where({ id: id, user_id: token.id })
-                                .update('preset', preset);
-                        })
-                        .then(function(r) {
-                            return h.response({ update: 'successful' }).code(200);
-                        })
-                        .catch(function(error) {
-                            return Boom.notFound(error.message);
-                        });
-                } catch (error) {
-                    return Boom.badImplementation(error);
-                }
+                return presetExists(id, token.id)
+                    .then(function() { // check first that to update exists, then update, otherwise throw 404 to user.
+                        return db('presets')
+                            .where({ id: id, user_id: token.id })
+                            .update('preset', preset);
+                    })
+                    .then(function(r) {
+                        return h.response({ update: 'successful' }).code(200);
+                    })
+                    .catch(function(error) {
+                        return Boom.notFound(error.message);
+                    });
             },
             cors: Object.assign({ additionalHeaders: ['cache-control', 'x-request-with'] }, contentTypeCors),
             validate: {
@@ -90,27 +82,22 @@ module.exports = {
         path: '/config',
         config: {
             handler: function(r, h) {
-                try {
-                    const token = r.auth.credentials;
-                    const presets = r.payload;
-                    const uuid = uuid4();
+                const token = r.auth.credentials;
+                const presets = r.payload;
+                const uuid = uuid4();
 
-                    return db('presets')
-                        .insert({
-                            id: uuid,
-                            preset: JSON.stringify(presets),
-                            user_id: token.id
-                        })
-                        .then(function(r) { // reply uuid used to generate the preset.
-                            return h.response({ upload: 'successful', id: uuid }).code(200);
-                        })
-                        .catch(function(error) {
-                            throw Boom.badImplementation(error.message);
-                        });
-
-                } catch (error) {
-                    return Boom.badImplementation(error);
-                }
+                return db('presets')
+                    .insert({
+                        id: uuid,
+                        preset: JSON.stringify(presets),
+                        user_id: token.id
+                    })
+                    .then(function(r) { // reply uuid used to generate the preset.
+                        return h.response({ upload: 'successful', id: uuid }).code(200);
+                    })
+                    .catch(function(error) {
+                        throw Boom.badImplementation(error.message);
+                    });
             },
             cors: Object.assign({ additionalHeaders: ['cache-control', 'x-request-with'] }, contentTypeCors),
             validate: {

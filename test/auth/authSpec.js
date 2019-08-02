@@ -179,15 +179,16 @@ describe('auth', () => {
         userXML2 = seedData.fakeUserDetail2;
 
         // set up nock
-        scope = nock(osm).persist(true);
+        scope = nock(osm).persist(false);
 
-        scope.post('/oauth/request_token').reply('200', function(uri, reqBody) {
+        scope.post('/oauth/request_token').times(1).reply('200', function(uri, reqBody) {
             let authHeaders = this.req.headers.authorization;
             let hasHeaders = authHeaders.includes('OAuth')
                 && authHeaders.includes('oauth_callback')
                 && authHeaders.includes('oauth_consumer_key');
 
             expect(hasHeaders).to.be.true;
+            scope.interceptors.shift();
             return requestTokenResp;
         });
 
@@ -224,7 +225,38 @@ describe('auth', () => {
 
             server.inject(request).then(function(r) {
                 expect(r.result).to.eql(oauthTokenUrl);
-                done();
+                // done();
+
+                scope.post('/oauth/request_token').reply('400');
+
+                const request = mergeDefaults({
+                    method: 'GET',
+                    url: '/auth/login'
+                });
+
+                server.inject(request).then(function(nextR) {
+                    expect(nextR.statusCode).to.eql(500);
+
+                    scope.post('/oauth/request_token').times(1).reply('200', function(uri, reqBody) {
+                        let authHeaders = this.req.headers.authorization;
+                        let hasHeaders = authHeaders.includes('OAuth')
+                            && authHeaders.includes('oauth_callback')
+                            && authHeaders.includes('oauth_consumer_key');
+
+                        expect(hasHeaders).to.be.true;
+                        scope.interceptors.shift();
+                        return '';
+                    });
+                    const request = mergeDefaults({
+                        method: 'GET',
+                        url: '/auth/login'
+                    });
+
+                    server.inject(request).then(function(lastR) {
+                        expect(lastR.statusCode).to.eql(500);
+                        done();
+                    });
+                });
             });
         });
     });

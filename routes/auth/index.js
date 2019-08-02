@@ -280,6 +280,9 @@ module.exports = {
                         let tokenResponse;
                         try {
                             tokenResponse = qs.parse(body);
+                            if (!Object.keys(tokenResponse).length) {
+                                throw new Error('empty response from OSM!');
+                            }
                         } catch (err) {
                             throw err;
                         }
@@ -327,9 +330,6 @@ module.exports = {
                         return h
                             .response(200)
                             .unstate('maprules_session');
-                    })
-                    .catch(function(e) {
-                        throw e;
                     });
             },
             cors: contentTypeCORS
