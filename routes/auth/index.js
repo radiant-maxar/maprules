@@ -11,14 +11,11 @@ const parseXML = require('xml2js').parseString;
 const uuid = require('uuid/v4');
 const jwt = require('jsonwebtoken');
 const callbackUrl = config.callbackUrl;
+const routesConfig = require('../config');
+const contentTypeCORS = routesConfig.contentTypeCORS;
 // const maprules = config.maprules;
 
 // https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
-const contentTypeCORS = {
-    origin: ['*'],
-    headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match', 'Access-Control-Allow-Origin'],
-    credentials: true
-}
 
 module.exports = {
     verify: authenticate({
@@ -247,7 +244,7 @@ module.exports = {
                     .then(function(resp) {
                         return h
                             .redirect(`${resp.origin}/login.html?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`)
-                            .state('maprules_session', jwt.sign(resp.jwt, config.jwt));
+                            .state('maprules_session', jwt.sign(resp.jwt, config.jwt), { path: '/' }); // set path so cookie usable for requesting configs
                     })
                     .catch(function(err) {
                         sessionsManager.remove(sessionId);
@@ -321,19 +318,17 @@ module.exports = {
                 return db('user_sessions')
                     .where(sessionWhere)
                     .delete()
-                    .then(function(r) {
+                    .then(function() {
                         return h
-                            .response('logged out')
-                            .code(200)
-                            .header('Content-Type', 'text')
-                            .header('X-Content-Type-Options', 'nosniff');
+                            .response(200)
+                            .unstate('maprules_session');
                     })
                     .catch(function(e) {
                         throw e;
                     });
             },
             cors: contentTypeCORS
-        },
+        }
     }),
     /**
      * the jwt strategy will capture fail cases and return 401.

@@ -6,6 +6,9 @@ const db = require('../../connection');
 const uuid4 = require('uuid/v4');
 const authenticate = require('../../jwtScheme').authenticate;
 
+const routesConfig = require('../config');
+const contentTypeCors = routesConfig.contentTypeCors;
+
 const presetExists = require('../helpers').presetExists;
 const validateIdPathParam = require('../helpers').validateIdPathParam;
 
@@ -72,14 +75,14 @@ module.exports = {
                     return Boom.badImplementation(error);
                 }
             },
+            cors: Object.assign({ additionalHeaders: ['cache-control', 'x-request-with'] }, contentTypeCors),
             validate: {
                 payload: presetConfigSchema,
                 params: { id: validateIdPathParam },
                 failAction: function(request, h, error) {
                     return Boom.badRequest(error.message);
                 }
-            },
-            cors: { origin: ['*'], additionalHeaders: ['cache-control', 'x-request-with'] }
+            }
         }
     }),
     post: authenticate({
@@ -109,10 +112,7 @@ module.exports = {
                     return Boom.badImplementation(error);
                 }
             },
-            cors: {
-                origin: ['*'],
-                additionalHeaders: ['cache-control', 'x-request-with']
-            },
+            cors: Object.assign({ additionalHeaders: ['cache-control', 'x-request-with'] }, contentTypeCors),
             validate: {
                 payload: presetConfigSchema,
                 failAction: function(request, h, error) {

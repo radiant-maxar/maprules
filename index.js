@@ -9,7 +9,7 @@ const jwtScheme = require('./jwtScheme').scheme;
 const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: process.env.HOST || 'localhost',
-    routes: { cors: true }
+    routes: { cors: { origin: ['*'], credentials: true } }
 });
 
 server.auth.scheme('jwt', jwtScheme);
