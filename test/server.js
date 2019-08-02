@@ -4,11 +4,12 @@ const Hapi = require('@hapi/hapi');
 const config = require('../config')['development'];
 const host = config.host;
 const jwtScheme = require('../jwtScheme').scheme;
-const yar = { plugin: require('@hapi/yar'),  options: config.yar };
 
 const server = Hapi.server({ port: 3001, host: host });
+
 server.auth.scheme('jwt', jwtScheme);
 server.auth.strategy('default', 'jwt');
+server.state('maprules_session', config.session);
 
 server.liftOff = async(route) => {
     try {
@@ -40,7 +41,6 @@ server.crashLanding = async() => {
 
 void async function() {
     try {
-        await server.register(yar);
         if (!module.parent) {
             await server.start();
 

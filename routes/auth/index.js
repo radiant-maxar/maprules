@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
 const callbackUrl = config.callbackUrl;
 const routesConfig = require('../config');
 const contentTypeCORS = routesConfig.contentTypeCORS;
-// const maprules = config.maprules;
+const toQueryString = require('../helpers').toQueryString;
 
 // https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 
@@ -22,7 +22,7 @@ module.exports = {
         method: 'GET',
         path: '/auth/verify',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
 
                 const { oauth_token, oauth_verifier } = r.query;
 
@@ -242,8 +242,13 @@ module.exports = {
                             });
                     })
                     .then(function(resp) {
+                        const queryString = toQueryString({
+                            oauth_token: oauthToken,
+                            oauth_verifier: oauthVerifier
+                        });
+
                         return h
-                            .redirect(`${resp.origin}/login.html?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`)
+                            .redirect(`${resp.origin}/login.html?${queryString}`)
                             .state('maprules_session', jwt.sign(resp.jwt, config.jwt), { path: '/' }); // set path so cookie usable for requesting configs
                     })
                     .catch(function(err) {
@@ -352,7 +357,7 @@ module.exports = {
         method: 'GET',
         path: '/auth/user',
         config: {
-            handler: function (r, h) {
+            handler: function(r, h) {
                 const user = jwt.verify(r.state.maprules_session, config.jwt);
                 return h
                     .response({ name: user.name, id: user.id })
