@@ -219,6 +219,7 @@ describe('helpers', () => {
                         { key: 'amenity', val: 'restaurant' }
                     ]
                 ].map(getIcon));
+
                 expect(restaurant.size).to.eql(1);
                 expect(restaurant.values().next().value).to.eql('maki-restaurant');
             });

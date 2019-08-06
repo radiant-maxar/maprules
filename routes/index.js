@@ -1,6 +1,7 @@
 'use strict';
 
 const { login, logout, callback, session, verify, user } = require('./auth');
+const presetConfig = require('./presetConfig');
 
 module.exports = [
     login,
@@ -14,9 +15,10 @@ module.exports = [
     require('./josmPresets').get,
     require('./josmRules').get,
     require('./mapcss').post,
-    require('./presetConfig').get,
-    require('./presetConfig').put,
-    require('./presetConfig').post,
+    presetConfig.get,
+    presetConfig.put,
+    presetConfig.post,
+    require('./explore').get,
     require('./docs'),
     require('./spec'),
     require('./rules')

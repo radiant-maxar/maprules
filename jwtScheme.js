@@ -114,5 +114,6 @@ function authenticate(route) {
 
 module.exports = {
     scheme: scheme,
-    authenticate: authenticate
+    authenticate: authenticate,
+    isAuthorized: isAuthorized
 };
