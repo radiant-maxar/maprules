@@ -61,15 +61,16 @@ exports.getiDDefaults = () => JSON.parse(JSON.stringify(ID_DEFAULTS));
  * @return {string} make icon type....
  */
 exports.getIcon = (primaryTags) => {
-    const tagsString = primaryTags.sort((a, b) => {
-        if (a.key < b.key) return -1;
-        if (a.key > b.key) return 1;
-        return 0;
-    }).map(tag => {
-        return (tag.val && tag.val !== '*')
-            ? `${tag.key}=${tag.val}`
-            : tag.key;
-    }).join(':');
-
+    const tagsString = primaryTags
+        .reduce(function(uniqueStrings, tag) {
+            var tagString = (tag.val && tag.val !== '*') ? `${tag.key}=${tag.val}` : tag.key;
+            if (uniqueStrings.indexOf(tagString) === -1) {
+                uniqueStrings.push(tagString);
+            }
+            return uniqueStrings;
+        }, [])
+        .sort()
+        .join(':');
+    console.log(ID_ICONS[tagsString] || 'maki-natural');
     return ID_ICONS[tagsString] || 'maki-natural';
 };

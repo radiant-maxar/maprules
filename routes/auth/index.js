@@ -70,15 +70,9 @@ module.exports = {
                      * ... if the token/verifier query parameters are not preset or it cannot find the partner oauth_token_secret, it returns an error.
                      */
                     method: function(r, h) { // gets called before handler...
-                        let oauthToken = r.query.oauth_token;
+                        let oauthToken = r.query.oauth_token, oauthVerifier = r.query.oauth_verifier;
 
-                        if (!oauthToken || !oauthToken.length) {
-                            throw err;
-                        }
-
-                        let oauthVerifier = r.query.oauth_verifier;
-
-                        if (!oauthToken || !oauthToken.length) {
+                        if (!oauthToken || !oauthToken.length || !oauthVerifier || !oauthVerifier.length) {
                             throw err;
                         }
 
@@ -87,13 +81,7 @@ module.exports = {
                         for (id of sessionsManager.sessions()) {
                             let session = sessionsManager.get(id);
 
-
-                            if (!session) {
-                                continue;
-                            }
-
-
-                            if (!session.oauth_token === oauthToken && session.user_agent !== r.headers['user-agent']) {
+                            if (!session || (!session.oauth_token === oauthToken && session.user_agent !== r.headers['user-agent'])) {
                                 continue;
                             }
 
@@ -242,10 +230,7 @@ module.exports = {
                             });
                     })
                     .then(function(resp) {
-                        const queryString = toQueryString({
-                            oauth_token: oauthToken,
-                            oauth_verifier: oauthVerifier
-                        });
+                        const queryString = toQueryString({ oauth_token: oauthToken, oauth_verifier: oauthVerifier });
 
                         return h
                             .redirect(`${resp.origin}/login.html?${queryString}`)
@@ -277,16 +262,10 @@ module.exports = {
 
                 return requestPromise(requestTokenConfig)
                     .then(function(body) {
-                        let tokenResponse;
-                        try {
-                            tokenResponse = qs.parse(body);
-                            if (!Object.keys(tokenResponse).length) {
-                                throw new Error('empty response from OSM!');
-                            }
-                        } catch (err) {
-                            throw err;
+                        let tokenResponse = qs.parse(body);
+                        if (!Object.keys(tokenResponse).length) {
+                            throw new Error('empty response from OSM!');
                         }
-
                         // create record ofo new session in sessions list so we can track response when
                         // logged in user comes back to callback_url
                         sessionsManager.add(uuid(), {
@@ -304,7 +283,6 @@ module.exports = {
 
                     })
                     .catch(function(error) {
-                        console.log(error);
                         throw error;
                     });
             }
