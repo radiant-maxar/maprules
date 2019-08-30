@@ -40,4 +40,5 @@ exports.toQueryString = function(queryParams) {
     return Object.keys(queryParams).map(function(param) {
         return `${param}=${queryParams[param]}`;
     }).join('&');
-}
+};
+

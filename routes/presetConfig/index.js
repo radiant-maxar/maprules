@@ -89,8 +89,8 @@ module.exports = {
                 return db('presets')
                     .insert({
                         id: uuid,
-                        preset: JSON.stringify(presets),
-                        user_id: token.id
+                        user_id: token.id,
+                        preset: JSON.stringify(presets)
                     })
                     .then(function(r) { // reply uuid used to generate the preset.
                         return h.response({ upload: 'successful', id: uuid }).code(200);

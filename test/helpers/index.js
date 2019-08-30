@@ -215,7 +215,7 @@ describe('helpers', () => {
                         { key: 'amenity', val: 'fast_food' }
                     ],
                     [
-                        { key: 'amenity', val: 'restaurant' },
+                        { key: 'cuisine', val: 'american' },
                         { key: 'amenity', val: 'restaurant' }
                     ]
                 ].map(getIcon));
