@@ -71,6 +71,5 @@ exports.getIcon = (primaryTags) => {
         }, [])
         .sort()
         .join(':');
-    console.log(ID_ICONS[tagsString] || 'maki-natural');
     return ID_ICONS[tagsString] || 'maki-natural';
 };
