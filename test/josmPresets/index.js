@@ -2,5 +2,6 @@
 
 describe('josmPresets', () => {
     describe('adapter', require('./adapterSpec'));
-    describe('handlers', require('./handlersSpec'));
+    describe('routes', require('./routesSpec'));
 });
+

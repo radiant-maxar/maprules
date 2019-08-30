@@ -1,19 +1,23 @@
 'use strict';
 
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const config = require('../config')['development'];
 const host = config.host;
+const jwtScheme = require('../jwtScheme').scheme;
+
 const server = Hapi.server({ port: 3001, host: host });
 
+server.auth.scheme('jwt', jwtScheme);
+server.auth.strategy('default', 'jwt');
+server.state('maprules_session', config.session);
 
-server.liftOff = async (route) => {
+server.liftOff = async(route) => {
     try {
         server.route(route);
-
         if (!module.parent) {
             await server.start();
             console.log(`test server started at ${server.info.uri}`);
-        
+
         } else {
             await server.initialize();
 
@@ -25,7 +29,7 @@ server.liftOff = async (route) => {
     }
 };
 
-server.crashLanding = async () => {
+server.crashLanding = async() => {
     try {
         return await server.stop();
 
@@ -35,7 +39,7 @@ server.crashLanding = async () => {
     }
 };
 
-void async function () {
+void async function() {
     try {
         if (!module.parent) {
             await server.start();

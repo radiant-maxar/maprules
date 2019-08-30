@@ -1,6 +1,6 @@
 'use strict';
 
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const tagChecksSchema = require('./tagChecks');
 const josmGeometries = require('../components').josmGeometries;
 const wayType = require('../components').wayType;

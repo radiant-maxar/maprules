@@ -2,7 +2,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const chai = require('chai');
 const expect = chai.expect;
 
@@ -39,7 +39,7 @@ module.exports = () => {
 
                 fields.forEach((field) => {
 
-                    buildTagChecks(field, primary, presetName, configName).forEach((tagCheck) => {                    
+                    buildTagChecks(field, primary, presetName, configName).forEach((tagCheck) => {
                         const validation = Joi.validate(tagCheck, tagChecksSchema);
                         expect(validation.value).to.be.deep.equal(tagCheck);
                         expect(validation.error).to.be.null;
@@ -51,7 +51,7 @@ module.exports = () => {
         it('catches invalid presets', () => {
             let invalidPresetConfig = presetConfigs[1];
             let configName = invalidPresetConfig.name;
-            
+
             let primary = invalidPresetConfig.presets[0].primary;
             let presetName = invalidPresetConfig.presets[0].name;
             let testField = invalidPresetConfig.presets[0].fields[0];
@@ -61,7 +61,7 @@ module.exports = () => {
     });
 
     describe('configRules', () => {
-        it('converts a preset object into a valid presetRules object', async () => {
+        it('converts a preset object into a valid presetRules object', async() => {
             const validConfig = presetConfigs[0];
             buildConfigRules(validConfig).forEach(configRule => {
                 const validation = Joi.validate(configRule, configRulesSchema);
@@ -80,15 +80,15 @@ module.exports = () => {
             expect(staticMapCSS).to.be.eql(adaptedMapCSS);
         });
         it('builds a MapCSS rule when fieldConditional is not present', () => {
-            const input = { 
+            const input = {
                 toThrow: 'throwError',
                 base: '[highway=yes]',
-                message: 'highway cannot be coupled with yes' 
+                message: 'highway cannot be coupled with yes'
             };
             const expectation = 'node[highway=yes]{throwError:"highway cannot be coupled with yes";}'.replace(/\s/g,'');
             expect(buildMapCSSRule(input, 'node').replace(/\n/g,'').replace(/\s+/g,'')).to.be.eql(expectation);
         });
-        it('catches errors when parsing', async () => {
+        it('catches errors when parsing', async() => {
             const invalidConfig = presetConfigs[1];
             expect(() => buildRules(invalidConfig)).to.throw(Error);
         });

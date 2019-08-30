@@ -22,6 +22,10 @@ function getIDPresets(done) {
 }
 
 function build() {
+    // make config files...
+    shell.exec('cp process.yml.in process.yml');
+    console.log(colors.rainbow('\nCONFIGS BUILT!\n\n'));
+
     // build docs
     shell.exec('npm run makedocs');
     console.log(colors.rainbow('\nDOCS BUILT!!\n\n'));

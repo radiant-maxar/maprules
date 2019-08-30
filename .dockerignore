@@ -1,0 +1,19 @@
+*.log
+npm-debug.log*
+yarn.lock
+package-lock.json
+# maprules
+.env
+doc
+spec
+rules/
+!adapters/rules
+!schemas/rules
+maprule/
+db/*.sqlite
+node_modules/
+.nyc_output/
+.vscode/
+coverage/
+adapters/iDPresets/icons.json
+**/*.in

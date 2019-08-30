@@ -1,5 +1,5 @@
 'use strict';
 
 describe('iDRules', () => {
-    describe('handlers', require('./handlersSpec'));
+    describe('routes', require('./routesSpec'));
 });

@@ -15,7 +15,7 @@ const getIcon = require('../../adapters/iDPresets/helpers').getIcon;
 // josm preset helpers
 const inferJosmGeometries = require('../../adapters/josmPresets/helpers').inferJosmGeometries;
 const josmGeometries = require('../../schemas/components').josmGeometries;
-// geometry ~ osm type constants 
+// geometry ~ osm type constants
 const NODE = require('../../adapters/constants').NODE;
 const WAY = require('../../adapters/constants').WAY;
 const CLOSEDWAY = require('../../adapters/constants').CLOSEDWAY;
@@ -27,7 +27,7 @@ const THROW_ERROR = require('../../adapters/constants').THROW_ERROR;
 const THROW_WARNING = require('../../adapters/constants').THROW_WARNING;
 
 const expect = require('chai').expect;
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 describe('helpers', () => {
     describe('adapters', () => {
@@ -205,11 +205,19 @@ describe('helpers', () => {
         });
         describe('getIcon', () => {
             it('returns icon for given set of tags', () => {
-                const primary = [
-                    { key: 'amenity', val: 'fast_food' },
-                    { key: 'cuisine', val: 'sandwich' }
-                ];
-                expect(getIcon(primary)).to.eql('maki-restaurant');
+                [
+                    [
+                        { key: 'amenity', val: 'fast_food' },
+                        { key: 'cuisine', val: 'kebab' }
+                    ],
+                    [
+                        { key: 'cuisine', val: 'american' },
+                        { key: 'amenity', val: 'restaurant' }
+                    ]
+                ].map(function(tags) {
+                    let icon = getIcon(tags);
+                    expect(icon).to.eql('maki-restaurant');
+                });
             });
             it('returns maki-natural if nothing found', () => {
                 const primary = [

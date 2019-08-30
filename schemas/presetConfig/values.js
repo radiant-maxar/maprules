@@ -1,6 +1,6 @@
 'use strict';
 
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 const keys = {
     valCondition: Joi.number().min(0).max(6),

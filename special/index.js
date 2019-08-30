@@ -1,21 +1,18 @@
-const seeds = require('./special');
-const db = require('../connection');
+'use strict';
 
-Promise = require('bluebird');
-const insertStatement = (id, presets) => `INSERT INTO presets VALUES ('${id}', json('${JSON.stringify(presets)}'))`;
+const seedData = require('./special');
 
-async function seed () {
+// adds user, user session, and presets needed to
+exports.seed = async(knex) => {
     try {
-        await db('presets').del();
-        return await Promise.map(seeds, async(seed) => {
-            try {
-                const id = seed.id, presets = seed.presets;
-                await db.raw(insertStatement(id, presets));
-                return process.exit(0);
-            } catch (error) {
-                console.error(error);
-            }
-        });
+        await knex('presets').del();
+        return Promise.all(seedData.presets.map(function(preset) {
+            return knex('presets').insert({
+                id: preset.id,
+                preset: JSON.stringify(preset.config),
+                user_id: seedData.user.id
+            });
+        }));
     } catch (error) {
         console.error(error);
 

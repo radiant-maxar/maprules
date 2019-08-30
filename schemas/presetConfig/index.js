@@ -1,6 +1,6 @@
 'use strict';
 
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const presetSchema = require('./preset');
 
 const disabledFeatures = Joi.object({ key: Joi.string(), val: Joi.array().items(Joi.string()) });

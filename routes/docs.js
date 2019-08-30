@@ -1,6 +1,17 @@
 
+'use strict';
+
+const path = require('path');
+
 module.exports = {
     method: 'GET',
     path: '/docs/{param*}',
-    handler: require('../handlers/docs')
+    options: { auth: false },
+    handler: {
+        directory: {
+            path: path.join(process.cwd(), 'doc'),
+            redirectToSlash: true,
+            index: true
+        }
+    }
 };

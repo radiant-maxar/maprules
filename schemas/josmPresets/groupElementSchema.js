@@ -1,6 +1,6 @@
 'use strict';
 
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const itemElementSchema = require('./itemElementSchema');
 
 const keys = {

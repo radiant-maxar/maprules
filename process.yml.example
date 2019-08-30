@@ -1,0 +1,31 @@
+apps:
+    - name: maprules
+      script: index.js
+      env_testing:
+          NODE_ENV: ''
+          PORT: ''
+          HOST: '',
+          CONSUMER_KEY: '',
+          CONSUMER_SECRET: '',
+          OSM_SITE: ''
+          YAR: '',
+          JWT: ''
+      env_development:
+          NODE_ENV: ''
+          PORT: ''
+          HOST: '',
+          CONSUMER_KEY: '',
+          CONSUMER_SECRET: '',
+          OSM_SITE: ''
+          YAR: '',
+          JWT: ''
+      env_production:
+          NODE_ENV: ''
+          PORT: ''
+          HOST: '',
+          CONSUMER_KEY: '',
+          CONSUMER_SECRET: '',
+          OSM_SITE: ''
+          YAR: '',
+          JWT: ''
+

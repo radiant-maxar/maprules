@@ -1,6 +1,6 @@
 'use strict';
 
 describe('josmRules', () => {
-    describe('handlers', require('./handlersSpec'));
+    describe('routes', require('./routesSpec'));
     describe('adapter', require('./adapterSpec'));
 });

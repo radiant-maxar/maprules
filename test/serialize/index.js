@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const expect = chai.expect;
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 
 const flattenElements = require('../../adapters/helpers').flattenElements;
 
@@ -215,13 +215,13 @@ describe('serialize', () => {
 
             const merged = mergePresets(test);
             expect(merged.length).to.eql(1);
-  
+
             const healthClinic = merged[0];
 
             expect(healthClinic.geometry).to.eql(['point', 'area']);
-            
-            // just a wierd way to do deep checking? 
-            // see that at each level the condition + import values 
+
+            // just a wierd way to do deep checking?
+            // see that at each level the condition + import values
             // matches what the input merge-able presets have...
             expect(healthClinic.primary.map(p => `${p.key}:${p.val}`)).to.eql(['healthcare:public','amenity:clinic']);
             expect(healthClinic.fields.map(f => `${f.key}:${f.keyCondition}`)).to.eql(['source:1', 'floors:1', 'building:1']);
