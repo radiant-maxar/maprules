@@ -1,33 +1,39 @@
 const host = process.env.HOST || 'http://localhost';
 const port = process.env.PORT || '3001';
+const maprules = `${host}:${port}`;
+
 module.exports = {
     'development': {
-        injectDefaults: { simulate: { error: false }},
+        maprules: maprules,
+        injectDefaults: { simulate: { error: false } },
         consumerKey: process.env.CONSUMER_KEY || '',
         consumerSecret: process.env.CONSUMER_SECRET || '',
-        callbackUrl: `${host}:${port}/auth/callback`,
+        callbackUrl: `${maprules}/auth/callback`,
         osmSite: process.env.OSM_SITE || '',
-        yar: {
-            cookieOptions: {
-                password: process.env.YAR, // password must be greater than 32 characters
-                isSecure: false // make true when requests are made of HTTPS
-            }
+        session: {
+            isSecure: false, // make true when requests are made of HTTPS
+            clearInvalid: true,
+            strictHeader: false
         },
-        jwt: process.env.JWT || ''
+        jwt: process.env.JWT || '',
+        sessionKey: process.env.SESSION_KEY || '',
+        cors: false
     },
     'testing': {
+        maprules: maprules,
         injectDefaults: { simulate: { error: false }},
         consumerKey: process.env.CONSUMER_KEY || '',
         consumerSecret: process.env.CONSUMER_SECRET || '',
-        callbackUrl: `${host}:${port}/auth/callback`,
+        callbackUrl: `${maprules}/auth/callback`,
         osmSite: process.env.OSM_SITE || '',
-        yar: {
-            cookieOptions: {
-                password: process.env.YAR,
-                isSecure: false
-            }
+        session: {
+            isSecure: false, // make true when requests are made of HTTPS
+            clearInvalid: true,
+            strictHeader: true
         },
-        jwt: process.env.JWT || ''
+        jwt: process.env.JWT || '',
+        sessionKey: process.env.SESSION_KEY || '',
+        cors: true
     }
 };
 

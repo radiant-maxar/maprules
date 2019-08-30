@@ -70,23 +70,15 @@ function isAuthorized(token, userAgent) {
 }
 
 function jwtAuthentication(request, h) {
-    return Promise.resolve(request.headers.authorization)
-        .then(function(authHeader) {
-            if (!authHeader || !authHeader.length) {
-                throw new Error('no token provided');
-            }
-
-            if (!authHeader.startsWith('Bearer ')) {
-                throw new Error('authentication strategy is invalid');
-            }
-
-            if (!authHeader.replace('Bearer ', '').length) {
+    return Promise.resolve(request.state.maprules_session)
+        .then(function(cookie) {
+            if (!cookie || !cookie.length) {
                 throw new Error('no token provided');
             }
 
             let token;
             try {
-                token = jwt.verify(authHeader.replace('Bearer ', ''), config.jwt);
+                token = jwt.verify(cookie, config.jwt);
             } catch (error) {
                 throw new Error('invalid token provided');
             }
@@ -122,5 +114,6 @@ function authenticate(route) {
 
 module.exports = {
     scheme: scheme,
-    authenticate: authenticate
+    authenticate: authenticate,
+    isAuthorized: isAuthorized
 };

@@ -32,3 +32,13 @@ exports.adaptError = function(error) {
 
 exports.validateIdPathParam = uuidSchema.error(new Error('id path parameter is invalid'));
 
+/**
+ * Little helper function to prevent manually adding query string params in response.
+ * Doing so is an easy way to 'miss a character and bring the system down!'
+ */
+exports.toQueryString = function(queryParams) {
+    return Object.keys(queryParams).map(function(param) {
+        return `${param}=${queryParams[param]}`;
+    }).join('&');
+};
+

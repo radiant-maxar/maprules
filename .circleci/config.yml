@@ -25,7 +25,7 @@ jobs:
             npm run fixture
           environment:
             NODE_ENV: testing
-            YAR: thelongestyarstringofalltimeever
+            SESSION_KEY: thelongestyarstringofalltimeever
             JWT: reveemitllafognirtsraytsegnoleht
       - run:
           name: test
@@ -33,7 +33,7 @@ jobs:
             npm test
           environment:
             NODE_ENV: testing
-            YAR: thelongestyarstringofalltimeever
+            SESSION_KEY: thelongestyarstringofalltimeever
             JWT: reveemitllafognirtsraytsegnoleht
             OSM_SITE: http://fake.osm.org
             CONSUMER_KEY: keythatconsumes

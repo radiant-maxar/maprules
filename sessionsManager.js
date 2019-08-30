@@ -1,29 +1,37 @@
 'use strict';
 
-let sessions = [];
+let sessions = {};
 
 /**
- * Manages list of current OSM oAuth sessions.
+ * Manages hashMap of current OSM oAuth sessions.
  *
- * These are different from the json web token sessions used for being 'logged in' to maprules...
- * These are the sessions where the service is communicating w/OpenStreetMap to get user details.
+ * values include information like origin of request,
+ * as well as the different tokens provided and needed
+ * while going through the OSM oAuth flow.
+ * Once a flow is complete (in literal terms, when we reply the redirect in the /auth/callback route)
+ * Or a flow has failed, we remove a session.
  *
  */
 module.exports = {
-    add: function(session) {
-        sessions.push(session);
+    add: function(session, value) {
+        sessions[session] = value;
     },
     get: function(idx) {
         return sessions[idx];
     },
-    all: function() {
-        return sessions;
+    update: function(session, value) {
+        let sessionConfig = sessions[session];
+        if (sessionConfig) {
+            sessionConfig = Object.assign(sessionConfig, value);
+        }
+    },
+    sessions: function() {
+        return Object.keys(sessions);
     },
     remove: function(session) {
-        const idx = sessions.indexOf(session);
-        if (idx !== -1) sessions.splice(idx, 1);
+        delete sessions[session];
     },
     clear: function() {
-        sessions = [];
+        sessions = {};
     }
 };

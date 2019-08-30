@@ -11,8 +11,49 @@ const parseXML = require('xml2js').parseString;
 const uuid = require('uuid/v4');
 const jwt = require('jsonwebtoken');
 const callbackUrl = config.callbackUrl;
+const routesConfig = require('../config');
+const contentTypeCORS = routesConfig.contentTypeCORS;
+const toQueryString = require('../helpers').toQueryString;
+
+// https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 
 module.exports = {
+    verify: authenticate({
+        method: 'GET',
+        path: '/auth/verify',
+        config: {
+            handler: function(r, h) {
+
+                const { oauth_token, oauth_verifier } = r.query;
+
+                if (!oauth_token || !oauth_verifier) {
+                    throw Error('missing required query parameters');
+                }
+
+                let match = false;
+                for (let id of sessionsManager.sessions()) {
+                    let session = sessionsManager.get(id);
+                    if (
+                        session.oauth_token === oauth_token &&
+                        session.oauth_verifier === oauth_verifier
+                    ) {
+                        match = true;
+                        sessionsManager.remove(id);
+                        break;
+                    }
+                }
+
+                if (!match) throw Error('query parameter values are invalid');
+
+                const user = jwt.verify(r.state.maprules_session, config.jwt);
+                return h
+                    .response({ name: user.name, id: user.id })
+                    .header('Content-Type', 'application/json')
+                    .code(200);
+            },
+            cors: contentTypeCORS
+        }
+    }),
     callback: {
         method: 'GET',
         path: '/auth/callback',
@@ -29,36 +70,25 @@ module.exports = {
                      * ... if the token/verifier query parameters are not preset or it cannot find the partner oauth_token_secret, it returns an error.
                      */
                     method: function(r, h) { // gets called before handler...
-                        let oauthToken = r.query.oauth_token;
+                        let oauthToken = r.query.oauth_token, oauthVerifier = r.query.oauth_verifier;
 
-                        if (!oauthToken || !oauthToken.length) {
+                        if (!oauthToken || !oauthToken.length || !oauthVerifier || !oauthVerifier.length) {
                             throw err;
                         }
 
-                        let oauthVerifier = r.query.oauth_verifier;
+                        let origin, oauthTokenSecret, userAgent, sessionId;
 
-                        if (!oauthToken || !oauthToken.length) {
-                            throw err;
-                        }
+                        for (id of sessionsManager.sessions()) {
+                            let session = sessionsManager.get(id);
 
-                        let oauthTokenSecret, userAgent, sessionId;
-
-                        for (let i = 0; i < sessionsManager.all().length; i++) {
-                            sessionId = sessionsManager.get(i);
-                            let session = r.yar.get(sessionId);
-
-                            if (!session) {
-                                sessionsManager.remove(sessionId);
-                                throw new Error('unknown session!!!');
-                            }
-
-
-                            if (!session.oauth_token === oauthToken && session.user_agent !== r.headers['user-agent']) {
+                            if (!session || (!session.oauth_token === oauthToken && session.user_agent !== r.headers['user-agent'])) {
                                 continue;
                             }
 
                             oauthTokenSecret = session.oauth_token_secret;
                             userAgent = session.user_agent;
+                            origin = session.origin;
+                            sessionId = id;
                             break;
                         }
 
@@ -71,14 +101,24 @@ module.exports = {
                             oauthVerifier: oauthVerifier,
                             oauthTokenSecret: oauthTokenSecret,
                             sessionId: sessionId,
-                            userAgent: userAgent
+                            userAgent: userAgent,
+                            origin: origin
                         };
 
                     }
                 }
             ],
             handler: function(r, h) {
-                let { oauthToken, oauthVerifier, oauthTokenSecret, sessionId, userAgent } = r.pre.callbackValidation;
+                let {
+                    oauthToken,
+                    oauthVerifier,
+                    oauthTokenSecret,
+                    sessionId,
+                    userAgent,
+                    origin
+                } = r.pre.callbackValidation;
+
+                sessionsManager.update(sessionId, { oauth_verifier: oauthVerifier });
 
                 const accessTokenConfig = {
                     url: `${osm}/oauth/access_token`,
@@ -147,8 +187,8 @@ module.exports = {
                                     };
 
                                     decodedJWT.session = uuid();
-                                    
-									if (!user.length) { // if new user, insert into db and make new session jwt
+
+                                    if (!user.length) { // if new user, insert into db and make new session jwt
                                         await db('users').insert(details);
                                         await db('user_sessions').insert({
                                             id: decodedJWT.session,
@@ -180,23 +220,24 @@ module.exports = {
                                         }
                                     }
 
-                                    return decodedJWT;
+                                    return {
+                                        jwt: decodedJWT,
+                                        origin: origin
+                                    };
                                 } catch (error) {
                                     throw error;
                                 }
                             });
                     })
-                    .then(function(decodedJWT) {
-                        sessionsManager.remove(sessionId);
-                        r.yar.clear(sessionId);
+                    .then(function(resp) {
+                        const queryString = toQueryString({ oauth_token: oauthToken, oauth_verifier: oauthVerifier });
 
-                        const signedToken = jwt.sign(decodedJWT, config.jwt);
-                        return h.response(signedToken).code(200);
+                        return h
+                            .redirect(`${resp.origin}/login.html?${queryString}`)
+                            .state('maprules_session', jwt.sign(resp.jwt, config.jwt), { path: '/' }); // set path so cookie usable for requesting configs
                     })
                     .catch(function(err) {
                         sessionsManager.remove(sessionId);
-                        r.yar.clear(sessionId);
-
                         throw err;
                     });
             }
@@ -221,23 +262,17 @@ module.exports = {
 
                 return requestPromise(requestTokenConfig)
                     .then(function(body) {
-                        let tokenResponse;
-                        try {
-                            tokenResponse = qs.parse(body);
-                        } catch (err) {
-                            throw err;
+                        let tokenResponse = qs.parse(body);
+                        if (!Object.keys(tokenResponse).length) {
+                            throw new Error('empty response from OSM!');
                         }
-
                         // create record ofo new session in sessions list so we can track response when
                         // logged in user comes back to callback_url
-                        const sessionId = uuid();
-                        sessionsManager.add(sessionId);
-
-                        // save the session in our session manager...
-                        r.yar.set(sessionId, {
+                        sessionsManager.add(uuid(), {
                             oauth_token: tokenResponse.oauth_token,
                             oauth_token_secret: tokenResponse.oauth_token_secret,
-                            user_agent: r.headers['user-agent']
+                            user_agent: r.headers['user-agent'],
+                            origin: r.headers.origin
                         });
 
                         return h
@@ -248,7 +283,6 @@ module.exports = {
 
                     })
                     .catch(function(error) {
-                        console.log(error);
                         throw error;
                     });
             }
@@ -270,17 +304,13 @@ module.exports = {
                 return db('user_sessions')
                     .where(sessionWhere)
                     .delete()
-                    .then(function(r) {
+                    .then(function() {
                         return h
-                            .response('logged out')
-                            .code(200)
-                            .header('Content-Type', 'text')
-                            .header('X-Content-Type-Options', 'nosniff');
-                    })
-                    .catch(function(e) {
-                        throw e;
+                            .response(200)
+                            .unstate('maprules_session');
                     });
-            }
+            },
+            cors: contentTypeCORS
         }
     }),
     /**
@@ -290,12 +320,29 @@ module.exports = {
     session: authenticate({
         method: 'GET',
         path: '/auth/session',
-        handler: function(r, h) {
-            return h
-                .response('authenticated')
-                .code(200)
-                .header('Content-Type', 'text')
-                .header('X-Content-Type-Options', 'nosniff');
+        config: {
+            handler: function(r, h) {
+                return h
+                    .response('authenticated')
+                    .code(200)
+                    .header('Content-Type', 'text')
+                    .header('X-Content-Type-Options', 'nosniff');
+            },
+            cors: contentTypeCORS
+        }
+    }),
+    user: authenticate({
+        method: 'GET',
+        path: '/auth/user',
+        config: {
+            handler: function(r, h) {
+                const user = jwt.verify(r.state.maprules_session, config.jwt);
+                return h
+                    .response({ name: user.name, id: user.id })
+                    .header('Content-Type', 'application/json')
+                    .code(200);
+            },
+            cors: contentTypeCORS
         }
     })
 };

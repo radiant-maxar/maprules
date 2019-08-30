@@ -205,11 +205,19 @@ describe('helpers', () => {
         });
         describe('getIcon', () => {
             it('returns icon for given set of tags', () => {
-                const primary = [
-                    { key: 'amenity', val: 'fast_food' },
-                    { key: 'cuisine', val: 'sandwich' }
-                ];
-                expect(getIcon(primary)).to.eql('maki-restaurant');
+                [
+                    [
+                        { key: 'amenity', val: 'fast_food' },
+                        { key: 'cuisine', val: 'kebab' }
+                    ],
+                    [
+                        { key: 'cuisine', val: 'american' },
+                        { key: 'amenity', val: 'restaurant' }
+                    ]
+                ].map(function(tags) {
+                    let icon = getIcon(tags);
+                    expect(icon).to.eql('maki-restaurant');
+                });
             });
             it('returns maki-natural if nothing found', () => {
                 const primary = [

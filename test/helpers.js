@@ -4,7 +4,7 @@ const db = require('../connection');
 const seedData = require('../testData/seeds');
 const signedToken = seedData.fakeToken;
 const injectDefaults = require('../config')['development'].injectDefaults;
-const authorizationHeader = { Authorization: `Bearer ${signedToken}` };
+const authorizationHeader = { Cookie: `maprules_session=${signedToken}` };
 
 exports.fixtureSession = function() {
     return db('user_sessions')

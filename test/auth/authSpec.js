@@ -34,11 +34,11 @@ describe('auth', () => {
                 done();
             });
         });
-        it('replies with 401 code when provided non-jwt token in authorization header', function(done) {
+        it('replies with 401 code when provided non-jwt token in the session cookie', function(done) {
             const request = Object.assign({}, mergeDefaults({
                 method: 'GET',
                 url: '/auth/session',
-                headers: { Authorization: 'Bearer blimblam' }
+                headers: { Cookie: 'maprules_session=womp' }
             }));
 
             server.inject(request).then(function(r) {
@@ -85,7 +85,7 @@ describe('auth', () => {
             const request = mergeDefaults({
                 method: 'GET',
                 url: '/auth/session',
-                headers: { Authorization: `Bearer ${unknownJWT}` }
+                headers: { Cookie: `maprules_session=${unknownJWT}` }
             });
 
             server.inject(request).then(function(r) {
@@ -143,7 +143,7 @@ describe('auth', () => {
                     const request = mergeDefaults({
                         method: 'GET',
                         url: '/auth/session',
-                        headers: { Authorization: `Bearer ${dummyJWT}` }
+                        headers: { Cookie: `maprules_session=${dummyJWT}` }
                     });
 
                     server.inject(request).then(function(r) {
@@ -181,13 +181,14 @@ describe('auth', () => {
         // set up nock
         scope = nock(osm).persist(true);
 
-        scope.post('/oauth/request_token').reply('200', function(uri, reqBody) {
+        scope.post('/oauth/request_token').times(1).reply('200', function(uri, reqBody) {
             let authHeaders = this.req.headers.authorization;
             let hasHeaders = authHeaders.includes('OAuth')
                 && authHeaders.includes('oauth_callback')
                 && authHeaders.includes('oauth_consumer_key');
 
             expect(hasHeaders).to.be.true;
+            scope.interceptors.shift();
             return requestTokenResp;
         });
 
@@ -236,8 +237,7 @@ describe('auth', () => {
             method: function(r, h) {
                 sessionManager.clear();
                 sessionId = uuid();
-                sessionManager.add(sessionId);
-                r.yar.set(sessionId, {
+                sessionManager.add(sessionId, {
                     oauth_token: oauthToken,
                     oauth_token_secret: oauthTokenSecret,
                     user_agent: r.headers['user-agent']
@@ -250,14 +250,26 @@ describe('auth', () => {
 
     });
     describe('callback', () => {
-        it('replies signed jwt when it receives authorized request from OSM site', function(done) {
+        it('replies a redirect response that includes a JWT in its \'Set-Cookie\' response header', function(done) {
             let request = mergeDefaults({
                 method: 'GET',
                 url: `/auth/callback?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
             });
 
             server.inject(request).then(function(r) {
-                let decoded = jwt.verify(r.result, config.jwt);
+                expect(r.statusCode).to.eql(302);
+                expect(r.headers.location).to.eql(
+                    `undefined/login.html?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`
+                );
+
+
+                let cookieHeaders = r.headers['set-cookie'][0].split(';').reduce(function(map, header) {
+                    var [name, value] = header.trim().split('=');
+                    map[name] = value || '';
+                    return map;
+                }, {});
+                let decoded = jwt.verify(cookieHeaders['maprules_session'], config.jwt);
+
                 expect(decoded.id).to.eql('1');
                 expect(decoded.name).to.eql('test_user');
                 expect(decoded.session).to.not.eql(seedData.fakeToken);
@@ -391,14 +403,12 @@ describe('auth', () => {
             let request = mergeDefaults({
                 method: 'POST',
                 url: '/auth/logout',
-                headers: { Authorization: `Bearer ${signedJWT}`, 'user-agent': 'james_bond' }
+                headers: { Cookie: `maprules_session=${signedJWT}`, 'user-agent': 'james_bond' }
             });
 
             // logout with session we just made...
             server.inject(request).then(function(r) {
                 expect(r.statusCode).to.eql(200); // we should have successfully logged out...
-                expect(r.result).to.eql('logged out');
-
                 db('user_sessions') // the session record should be removed from user_sessions table...
                     .where({ user_id: 1, user_agent: userAgent })
                     .then(function(sessions) {

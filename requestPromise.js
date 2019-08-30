@@ -8,10 +8,11 @@ const request = require('request');
 let requestPromise = function(options) {
     return new Promise (function(resolve, reject) {
         request(options, function(err, rs, body) {
-            if (err) {
-                reject(err);
+            if (err || rs.statusCode !== 200) {
+                reject(err || { statusCode: rs.statusCode });
+            } else {
+                resolve(body);
             }
-            resolve(body);
         });
     });
 };
