@@ -103,7 +103,7 @@ NODE_ENV=development JWT=${some.jwt} yarn fixture
 #### Spin up the server
 
 ```
-yarn dev // propended with all needed env variables...
+PORT=3001 yarn dev
 ```
 
 #### Test
